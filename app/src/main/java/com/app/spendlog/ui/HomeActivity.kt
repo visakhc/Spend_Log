@@ -21,7 +21,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
 
         init()
     }
-
+//TODO add settings and firebase and nightmode
     private fun init() {
         setBudget()
         modelList.add(SpendModel("minus","200.0","21-02-2022","8:08pm"))
