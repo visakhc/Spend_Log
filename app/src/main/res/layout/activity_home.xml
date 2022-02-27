@@ -2,8 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:id="@+id/home_layout"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.HomeActivity">
 
@@ -12,30 +12,36 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.15"
+        app:layout_constraintGuide_percent="0.10"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <include
+        android:id="@+id/incl_layout"
+        layout="@layout/toolbar_home"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cv_budget"
-        android:layout_width="@dimen/_100sdp"
-        android:layout_height="@dimen/_100sdp"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_120sdp"
+        android:outlineSpotShadowColor="@color/red"
         android:visibility="visible"
         app:cardCornerRadius="30dp"
-        app:cardElevation="5dp"
+        app:cardElevation="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/guideline2">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
 
 
             <TextView
                 android:id="@+id/tv_budget_view"
                 style="@style/extraLargeTextMedium"
+                android:textSize="@dimen/_40ssp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_50sdp"
                 android:layout_gravity="center"
                 android:text="0.0"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -43,7 +49,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
 
@@ -51,9 +56,10 @@
         android:id="@+id/cv_add"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/_125sdp"
+        android:outlineSpotShadowColor="@color/lime_green"
         android:visibility="gone"
         app:cardCornerRadius="30dp"
-        app:cardElevation="10dp"
+        app:cardElevation="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/guideline2">
@@ -100,13 +106,36 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/tv_add_spend"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_35sdp"
+        android:layout_marginTop="@dimen/_50sdp"
+        android:clickable="true"
+        android:focusable="true"
+        android:outlineSpotShadowColor="#03A9F4"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cv_budget" >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add a Spend"
+            android:layout_marginHorizontal="@dimen/_20sdp"
+            android:layout_gravity="center"
+            style="@style/normalTextRegular"/>
+    </com.google.android.material.card.MaterialCardView>
+
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/spend_recycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cv_budget" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_add_spend" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

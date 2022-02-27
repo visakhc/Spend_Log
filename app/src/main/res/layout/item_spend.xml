@@ -2,23 +2,24 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    app:cardCornerRadius="10dp"
-    app:cardElevation="4dp"
-    android:layout_marginTop="@dimen/_5sdp"
+    android:layout_height="50dp"
     android:layout_marginHorizontal="@dimen/_5sdp"
-    android:layout_height="50dp">
+    android:layout_marginTop="@dimen/_5sdp"
+    android:outlineSpotShadowColor="@color/lime_green"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="5dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/tv_spend"
+            android:id="@+id/tv_amount_spend"
             style="@style/normalTextRegular"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingStart="30dp"
             android:layout_weight="1"
+            android:paddingStart="30dp"
             android:text="0.0"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/tv_date"
@@ -26,19 +27,8 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tv_time"
-            style="@style/normalTextRegular"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="time"
-            android:paddingHorizontal="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
             android:id="@+id/tv_date"
-            style="@style/normalTextRegular"
+            style="@style/smallTextRegular"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="date"
@@ -46,16 +36,26 @@
             app:layout_constraintEnd_toStartOf="@+id/tv_time"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/tv_time"
+            style="@style/smallTextRegular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="10dp"
+            android:text="time"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <ImageView
             android:id="@+id/iv_spend_type"
             android:layout_width="@dimen/_20sdp"
             android:layout_height="@dimen/_40sdp"
+            android:layout_marginStart="8dp"
+            android:padding="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:padding="5dp"
-            android:layout_marginStart="5dp"
-            app:srcCompat="@drawable/ic_add" />
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>
