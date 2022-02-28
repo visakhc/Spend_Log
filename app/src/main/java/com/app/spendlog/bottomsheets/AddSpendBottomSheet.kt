@@ -12,8 +12,12 @@ import com.app.spendlog.model.SpendModel
 import com.app.spendlog.ui.HomeActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.database.FirebaseDatabase
 
 class AddSpendBottomSheet : BottomSheetDialogFragment() {
+    private var mSpendId = 3
+    private val firebaseDatabase = FirebaseDatabase.getInstance()
+    private val root = firebaseDatabase.getReference("user1")
     private var binding: BottomsheetAddSpendBinding? = null
 
     override fun onCreateView(
@@ -37,7 +41,6 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun init() {
-
         handleEvents()
     }
 
@@ -50,11 +53,13 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
 
             if (spendType.isEmpty() || amount.isEmpty() || date.isEmpty() || time.isEmpty()) {
                 Toast.makeText(requireContext(), "Fill All Data", Toast.LENGTH_SHORT).show()
-            }else{/*
-
-               val model= mutableListOf(SpendModel("adthjfvd","200.0","21-02-2022","8:08pm"))
-                HomeActivity().setRecycler(model)*/
-                Toast.makeText(requireContext(), "Done", Toast.LENGTH_SHORT).show()
+            } else {
+                root.child(mSpendId.toString()).child("spendType").setValue(spendType)
+                root.child(mSpendId.toString()).child("amount").setValue(amount)
+                root.child(mSpendId.toString()).child("date").setValue(date)
+                root.child(mSpendId.toString()).child("time").setValue(time)
+                dialog?.dismiss()
+                Toast.makeText(requireContext(), "Added", Toast.LENGTH_SHORT).show()
 
             }
         }
