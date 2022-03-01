@@ -7,10 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.app.spendlog.R
+import com.app.spendlog.adapter.SpendAdapter
 import com.app.spendlog.databinding.BottomsheetAddSpendBinding
 import com.app.spendlog.ui.HomeActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import java.text.DateFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.*
@@ -47,10 +51,82 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun init() {
+
+        listeners()
         handleEvents()
     }
 
+
     private fun handleEvents() {
+        binding?.fabSave?.setOnClickListener {
+            val spendType = binding?.etSpendType?.text.toString()
+            val amount = binding?.etAmount?.text.toString()
+            val d = mSpendId
+
+            if (spendType.isEmpty() || amount.isEmpty() || mDate.isEmpty() || mTime.isEmpty()) {
+                Toast.makeText(requireContext(), "Fill All Data", Toast.LENGTH_SHORT).show()
+            } else {
+                /*  spendKey.child(d.toString()).child("spendType").setValue(spendType)
+                      .addOnSuccessListener {
+                          spendKey.child(d.toString()).child("amount").setValue(amount)
+                              .addOnSuccessListener {
+                                  spendKey.child(d.toString()).child("date").setValue(mDate)
+                                      .addOnSuccessListener {
+                                          spendKey.child(d.toString()).child("time")
+                                              .setValue(mTime).addOnSuccessListener {
+                                              dialog?.dismiss()
+                                              Toast.makeText(
+                                                  requireContext(),
+                                                  "Added",
+                                                  Toast.LENGTH_SHORT
+                                              ).show()
+
+                                          }
+
+                                      }
+
+                              }
+
+                      }
+  */
+                spendKey.child(mSpendId.toString()).apply {
+                    child("spendType").setValue(spendType)
+                    child("amount").setValue(amount)
+                    child("date").setValue(mDate)
+                    child("time").setValue(mTime)
+                }
+                dialog?.dismiss()
+                Toast.makeText(requireContext(), "Added", Toast.LENGTH_SHORT).show()
+
+            }
+        }
+    }
+
+    private fun listeners() {
+   /*     spendKey.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val spendId = snapshot.childrenCount.toInt()
+                if (snapshot.exists()) {
+                    Log.d("SpendNN", spendId.toString())
+                    mSpendId = spendId + 1
+                } else
+                    mSpendId = 1
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+        })*/
+
+spendKey.get().addOnSuccessListener {
+   val spendId = it.childrenCount.toInt()
+    if (it.exists()) {
+        Log.d("SpendNN", spendId.toString())
+        mSpendId = spendId + 1
+    } else
+        mSpendId = 1
+}
+
         binding?.tpTime?.setOnTimeChangedListener { timePicker, hour, minute ->
             var hr = hour
             var amPM = ""
@@ -79,27 +155,8 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
             today.get(Calendar.YEAR), today.get(Calendar.MONTH),
             today.get(Calendar.DAY_OF_MONTH)
         ) { _, year, month, day ->
-            val month = DateFormatSymbols().shortMonths[month]
-            mDate = "$month $day, $year"
-        }
-
-
-        binding?.fabSave?.setOnClickListener {
-            val spendType = binding?.etSpendType?.text.toString()
-            val amount = binding?.etAmount?.text.toString()
-
-            if (spendType.isEmpty() || amount.isEmpty() || mDate.isEmpty()  || mTime.isEmpty()) {
-                Toast.makeText(requireContext(), "Fill All Data", Toast.LENGTH_SHORT).show()
-            } else {
-                Log.d("DEBZ",spendType+"----"+amount+"----"+mDate+"----"+mTime)
-                spendKey.child(mSpendId.toString()).child("spendType").setValue(spendType)
-                spendKey.child(mSpendId.toString()).child("amount").setValue(amount)
-                spendKey.child(mSpendId.toString()).child("date").setValue(mDate)
-                spendKey.child(mSpendId.toString()).child("time").setValue(mTime)
-                dialog?.dismiss()
-                Toast.makeText(requireContext(), "Added", Toast.LENGTH_SHORT).show()
-
-            }
+            val emonth = DateFormatSymbols().shortMonths[month]
+            mDate = "$emonth $day, $year"
         }
     }
 }

@@ -56,7 +56,6 @@
         android:id="@+id/cv_add"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/_125sdp"
-        android:outlineSpotShadowColor="@color/lime_green"
         android:visibility="gone"
         app:cardCornerRadius="30dp"
         app:cardElevation="50dp"

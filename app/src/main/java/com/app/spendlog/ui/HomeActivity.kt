@@ -12,14 +12,14 @@ import com.app.spendlog.adapter.SpendAdapter
 import com.app.spendlog.bottomsheets.AddSpendBottomSheet
 import com.app.spendlog.databinding.ActivityHomeBinding
 import com.app.spendlog.model.SpendModel
+import com.firebase.ui.database.SnapshotParser
 import com.google.firebase.database.*
 
 
 class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     private var mBudget = 0
-
+    private var lastID = -1
     var modelList = mutableListOf<SpendModel>()
-var arraySpendId = arrayListOf<String>()
     private val firebaseDatabase = FirebaseDatabase.getInstance()
     private val rootKey = firebaseDatabase.getReference("user1")
     private val spendKey = rootKey.child("spend")
@@ -30,80 +30,21 @@ var arraySpendId = arrayListOf<String>()
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
-        init()
-    }
 
-    private fun getSpendID() {
-        arraySpendId.clear()
-        spendKey.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                val spendId = snapshot.childrenCount.toString()
-                Log.d("as",spendId)
-                arraySpendId.add(spendId)
-            }
-
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                val spendId = snapshot.key.toString()
-                Log.d("SPENDID",spendId)
-                arraySpendId.add(spendId)
-
-            }
-
-            override fun onChildRemoved(snapshot: DataSnapshot) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-
-        }
-
-        )
-        Log.d("as","last")
-
-        getSpendData()
-    }
-
-    private fun getSpendData() {
-        modelList.clear()
-
-        spendKey.child("0").addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-
-                if (dataSnapshot.exists()) {
-
-                    val user = dataSnapshot.getValue(SpendModel::class.java)
-                    modelList.add(user!!)
-                }
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-            }
-        })
-        setRecycler(modelList)
-    }
-
-    //TODO add settings and firebase and nightmode
-    private fun init() {
-        setBudget()
 
         binding?.spendRecycler?.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@HomeActivity)
         }
+        init()
+    }
+
+    private fun init() {
+        setBudget()
         getSpendID()
         handleEvents()
     }
 
-    fun setRecycler(model: MutableList<SpendModel>) {
-        binding?.spendRecycler?.adapter = SpendAdapter(model, this@HomeActivity)
-    }
 
     private fun setBudget() {
         rootKey.child("budget").addValueEventListener(object : ValueEventListener {
@@ -118,8 +59,64 @@ var arraySpendId = arrayListOf<String>()
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
             }
         })
+    }
 
 
+    fun getSpendID() {
+        spendKey.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val spendId = snapshot.childrenCount.toInt()
+                if (snapshot.exists() && spendId != lastID) {
+                    lastID = spendId
+                    getSpendData(spendId)
+                } else {
+                    Log.d("INNN", "Dont Mind Error")
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+        }
+        )
+/*
+        spendKey.get().addOnSuccessListener {
+            Log.d("GETFunc", it.childrenCount.toString())
+            val spendId = it.childrenCount.toInt()
+            if (it.exists()) {
+                getSpendData(spendId)
+            }
+        }*/
+    }
+
+
+    private fun getSpendData(spendCount: Int) {
+        modelList.clear()
+        for (i in 1..spendCount) {
+            Log.d("spendSIze", "For loop $i")
+            spendKey.child(i.toString()).addValueEventListener(object : ValueEventListener {
+
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        Log.d("spendSIze", dataSnapshot.toString())
+
+                        val user = dataSnapshot.getValue(SpendModel::class.java)
+                        modelList.add(user!!)
+                        setRecycler(modelList)
+
+                    }
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+                }
+            })
+        }
+
+    }
+
+    fun setRecycler(model: MutableList<SpendModel>) {
+        binding?.spendRecycler?.adapter = SpendAdapter(model, this@HomeActivity)
     }
 
     private fun handleEvents() {
