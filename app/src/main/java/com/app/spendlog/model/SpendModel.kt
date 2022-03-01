@@ -1,8 +1,9 @@
 package com.app.spendlog.model
 
-class SpendModel(
-    val type: String,
-    val amount: String,
-    val date: String,
-    val time: String
+data class SpendModel(
+    val date: String? = null,
+    val amount: String? = null,
+    val time: String? = null,
+    val spendType: String? = null
 )
+

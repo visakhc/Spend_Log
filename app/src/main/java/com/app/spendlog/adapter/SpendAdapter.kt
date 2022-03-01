@@ -52,9 +52,9 @@ class SpendAdapter(
             holder.amount.text = amount
             holder.time.text = time
             holder.date.text = date
-            if (type == "add")
+            if (spendType == "add")
                 holder.spendType.setImageResource(R.drawable.ic_add)
-            else if (type == "minus")
+            else if (spendType == "minus")
                 holder.spendType.setImageResource(R.drawable.ic_remove)
             else
                 holder.spendType.setImageResource(R.drawable.ic_rupee)

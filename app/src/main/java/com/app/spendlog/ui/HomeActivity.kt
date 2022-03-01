@@ -12,98 +12,101 @@ import com.app.spendlog.adapter.SpendAdapter
 import com.app.spendlog.bottomsheets.AddSpendBottomSheet
 import com.app.spendlog.databinding.ActivityHomeBinding
 import com.app.spendlog.model.SpendModel
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 
 
 class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     private var mBudget = 0
-    var modelList = mutableListOf<SpendModel>()
 
+    var modelList = mutableListOf<SpendModel>()
+var arraySpendId = arrayListOf<String>()
     private val firebaseDatabase = FirebaseDatabase.getInstance()
-    private val root = firebaseDatabase.getReference("user1")
+    private val rootKey = firebaseDatabase.getReference("user1")
+    private val spendKey = rootKey.child("spend")
+
     private var binding: ActivityHomeBinding? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
-
         init()
+    }
+
+    private fun getSpendID() {
+        arraySpendId.clear()
+        spendKey.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val spendId = snapshot.childrenCount.toString()
+                Log.d("as",spendId)
+                arraySpendId.add(spendId)
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                val spendId = snapshot.key.toString()
+                Log.d("SPENDID",spendId)
+                arraySpendId.add(spendId)
+
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+
+        }
+
+        )
+        Log.d("as","last")
+
+        getSpendData()
+    }
+
+    private fun getSpendData() {
+        modelList.clear()
+
+        spendKey.child("0").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+
+                if (dataSnapshot.exists()) {
+
+                    val user = dataSnapshot.getValue(SpendModel::class.java)
+                    modelList.add(user!!)
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+            }
+        })
+        setRecycler(modelList)
     }
 
     //TODO add settings and firebase and nightmode
     private fun init() {
         setBudget()
-        setModelData()
-        modelList.add(SpendModel("minus", "200.0", "21-02-2022", "8:08pm"))
-        setRecycler(modelList)
-        handleEvents()
 
-    }
-
-    private fun setModelData() {
-        var spendType = ""
-        var amount = ""
-        var date = ""
-        var time = ""
-
-        root.child("spendType").addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                spendType = dataSnapshot.value.toString()
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-            }
-        })
-        root.child("amount").addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                amount = dataSnapshot.value.toString()
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-            }
-        })
-        root.child("date").addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                date = dataSnapshot.value.toString()
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-            }
-        })
-        root.child("time").addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                time = dataSnapshot.value.toString()
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-            }
-        })
-        modelList.add(SpendModel(spendType, amount, date, time))
-    }
-
-
-    private fun getSpend() {
-
-    }
-
-    private fun setRecycler(model: MutableList<SpendModel>) {
         binding?.spendRecycler?.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@HomeActivity)
-            adapter = SpendAdapter(model, this@HomeActivity)
         }
+        getSpendID()
+        handleEvents()
+    }
+
+    fun setRecycler(model: MutableList<SpendModel>) {
+        binding?.spendRecycler?.adapter = SpendAdapter(model, this@HomeActivity)
     }
 
     private fun setBudget() {
-        root.child("budget").addValueEventListener(object : ValueEventListener {
+        rootKey.child("budget").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val post = dataSnapshot.value.toString()
                 binding?.tvBudgetView?.text = post
@@ -121,7 +124,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
 
     private fun handleEvents() {
         binding?.inclLayout?.ivSettings?.setOnClickListener {
-            Toast.makeText(this, "ComingSoon..", Toast.LENGTH_SHORT).show()
+            getSpendID()
         }
         binding?.cvBudget?.setOnClickListener {
             binding?.cvAdd?.visibility = View.VISIBLE
@@ -133,12 +136,12 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
         }
         binding?.ivPlus?.setOnClickListener {
             mBudget += 500
-            root.child("budget").setValue(mBudget.toString())
+            rootKey.child("budget").setValue(mBudget.toString())
         }
         binding?.ivMinus?.setOnClickListener {
             while (mBudget >= 500) {
                 mBudget -= 500
-                root.child("budget").setValue(mBudget.toString())
+                rootKey.child("budget").setValue(mBudget.toString())
             }
         }
         binding?.tvAddSpend?.setOnClickListener {

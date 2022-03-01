@@ -47,7 +47,10 @@ dependencies {
     //size library
     implementation 'com.intuit.sdp:sdp-android:1.0.6'
     implementation 'com.intuit.ssp:ssp-android:1.0.6'
-    implementation 'com.google.firebase:firebase-database:19.2.1'
+    implementation 'com.google.firebase:firebase-database:20.0.3'
+    implementation 'com.google.firebase:firebase-database-ktx:20.0.3'
+    implementation 'com.firebaseui:firebase-ui-database:8.0.0'
+    implementation platform('com.google.firebase:firebase-bom:28.4.2')
 
 
     testImplementation 'junit:junit:4.13.2'
