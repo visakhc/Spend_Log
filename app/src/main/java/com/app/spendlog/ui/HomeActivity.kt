@@ -78,6 +78,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
                 TODO("Not yet implemented")
             }
         }
+
         )
 /*
         spendKey.get().addOnSuccessListener {

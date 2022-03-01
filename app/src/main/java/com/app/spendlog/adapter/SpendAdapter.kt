@@ -52,12 +52,7 @@ class SpendAdapter(
             holder.amount.text = amount
             holder.time.text = time
             holder.date.text = date
-            if (spendType == "add")
-                holder.spendType.setImageResource(R.drawable.ic_add)
-            else if (spendType == "minus")
-                holder.spendType.setImageResource(R.drawable.ic_remove)
-            else
-                holder.spendType.setImageResource(R.drawable.ic_rupee)
+            holder.spendType.setImageResource(R.drawable.ic_remove)
         }
     }
 }
