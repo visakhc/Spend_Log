@@ -53,7 +53,7 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
     }
 //TODO add custom icons for spend
     private fun init() {
-        val items = listOf("General","Food", "Fuel", "Recharge","Bills", "Movie","Online Shopping")
+        val items = listOf("General","Food", "Fuel", "Recharge","Bills", "Movies","Online Shopping")
         val adapter = ArrayAdapter(requireContext(), R.layout.item_spend_type, items)
         (binding?.tlType?.editText as? AutoCompleteTextView)?.setAdapter(adapter)
         listeners()
@@ -64,9 +64,7 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
     private fun handleEvents() {
         binding?.fabSave?.setOnClickListener {
             val spendType = binding?.tlType?.editText?.text.toString()
-            Toast.makeText(requireContext(), "$spendType", Toast.LENGTH_SHORT).show()
-           /* val amount = binding?.etAmount?.text.toString()
-            val d = mSpendId
+            val amount = binding?.etAmount?.text.toString()
 
             if (spendType.isEmpty() || amount.isEmpty() || mDate.isEmpty() || mTime.isEmpty()) {
                 Toast.makeText(requireContext(), "Fill All Data", Toast.LENGTH_SHORT).show()
@@ -80,7 +78,7 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
                 dialog?.dismiss()
                 Toast.makeText(requireContext(), "Added", Toast.LENGTH_SHORT).show()
 
-            }*/
+            }
         }
     }
 

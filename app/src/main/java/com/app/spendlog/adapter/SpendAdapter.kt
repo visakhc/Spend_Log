@@ -52,7 +52,17 @@ class SpendAdapter(
             holder.amount.text = amount
             holder.time.text = time
             holder.date.text = date
-            holder.spendType.setImageResource(R.drawable.ic_remove)
+
+            when (spendType) {
+                "General" -> holder.spendType.setImageResource(R.drawable.ic_rupees)
+                "Food" -> holder.spendType.setImageResource(R.drawable.ic_food)
+                "Fuel" -> holder.spendType.setImageResource(R.drawable.ic_fuel)
+                "Recharge" -> holder.spendType.setImageResource(R.drawable.ic_recharge)
+                "Bills" -> holder.spendType.setImageResource(R.drawable.ic_bill)
+                "Movies" -> holder.spendType.setImageResource(R.drawable.ic_movies)
+                "Online Shopping" -> holder.spendType.setImageResource(R.drawable.ic_shopping)
+            }
+
         }
     }
 }
