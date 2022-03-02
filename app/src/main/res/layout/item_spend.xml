@@ -2,11 +2,11 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:layout_marginHorizontal="@dimen/_5sdp"
-    android:layout_marginTop="@dimen/_5sdp"
-    android:outlineSpotShadowColor="@color/lime_green"
-    app:cardCornerRadius="10dp"
+    android:layout_height="45dp"
+    android:layout_marginHorizontal="@dimen/_10sdp"
+    android:layout_marginTop="@dimen/_10sdp"
+    android:outlineSpotShadowColor="@color/green"
+    app:cardCornerRadius="15dp"
     app:cardElevation="5dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -15,12 +15,12 @@
 
         <TextView
             android:id="@+id/tv_amount_spend"
-            style="@style/mediumTextRegular"
+            style="@style/normalTextRegular"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:paddingStart="30dp"
+            android:paddingStart="20dp"
             android:text="0.0"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/tv_date"
@@ -53,7 +53,7 @@
             android:layout_width="@dimen/_20sdp"
             android:layout_height="match_parent"
             android:layout_marginStart="12dp"
-            android:padding="4dp"
+            android:padding="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

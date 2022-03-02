@@ -1,32 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    app:cardCornerRadius="20dp">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="@dimen/_160sdp"
+    android:layout_height="@dimen/_160sdp"
+    app:cardCornerRadius="25dp">
+
+    <ImageView
+        android:id="@+id/iv_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.09"
+        android:padding="@dimen/_40sdp"
+        android:rotation="-25"
+        android:scaleType="fitCenter"
+        app:srcCompat="@drawable/ic_fuel" />
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginHorizontal="@dimen/_50sdp">
+        android:layout_gravity="center">
 
         <TextView
             android:id="@+id/tv_date"
-            style="@style/smallTextRegular"
+            style="@style/normalTextRegular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_15sdp"
+            android:layout_marginBottom="@dimen/_20sdp"
             android:text="Feb 02, 2022"
             android:textColor="@color/black"
+            app:layout_constraintBottom_toTopOf="@+id/tv_amount"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/tv_time"
-            style="@style/verySmallTextRegular"
+            style="@style/smallTextRegular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="08:50 pm"
@@ -35,31 +45,41 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_date" />
 
+
         <TextView
             android:id="@+id/tv_amount"
             style="@style/extraLargeTextMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="500"
-            android:textSize="@dimen/_30ssp"
             android:layout_marginVertical="@dimen/_20sdp"
+            android:text="500"
             android:textColor="@color/black"
-            app:layout_constraintBottom_toTopOf="@+id/tv_type"
+            android:textSize="@dimen/_30ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/guidelineH"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_time" />
-
-
+            app:layout_constraintTop_toTopOf="@+id/guidelineH"
+            android:drawableEnd="@drawable/ic_rupee"
+            app:drawableTint="@color/black" />
         <TextView
             android:id="@+id/tv_type"
-            style="@style/smallTextRegular"
+            style="@style/normalTextRegular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/_20sdp"
+            android:layout_marginVertical="@dimen/_15sdp"
             android:text="spend type"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineH"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintGuide_percent="0.5"
             app:layout_constraintStart_toStartOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 

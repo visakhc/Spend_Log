@@ -1,19 +1,21 @@
 package com.app.spendlog.ui
 //TODO Add an mBudget increment variable for easy access
 
-import android.app.Activity
 import android.app.Dialog
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.Window
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.app.spendlog.LoginActivity
 import com.app.spendlog.R
 import com.app.spendlog.adapter.SpendAdapter
 import com.app.spendlog.bottomsheets.AddSpendBottomSheet
@@ -27,7 +29,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     private var lastID = -1
     var modelList = mutableListOf<SpendModel>()
     private val firebaseDatabase = FirebaseDatabase.getInstance()
-    private val rootKey = firebaseDatabase.getReference("user1")
+    private var rootKey = firebaseDatabase.getReference("user1")
     private val spendKey = rootKey.child("spend")
 
     private var binding: ActivityHomeBinding? = null
@@ -36,7 +38,13 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
-
+        val intent = getIntent()
+        val userId = intent.getStringExtra("userId")
+        val userName = intent.getStringExtra("userName")
+        val userPicture = intent.getStringExtra("userPic")
+        Toast.makeText(this, "$userId--\n--$userName--\n--$userPicture", Toast.LENGTH_SHORT).show()
+//        rootKey = rootKey.child(userId)
+//add sharedpref TODO
 
         binding?.spendRecycler?.apply {
             setHasFixedSize(true)
@@ -118,6 +126,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
 
     private fun handleEvents() {
         binding?.inclLayout?.ivSettings?.setOnClickListener {
+            LoginActivity().signOut(this@HomeActivity)
         }
         binding?.cvBudget?.setOnClickListener {
             binding?.cvAdd?.visibility = View.VISIBLE
@@ -156,7 +165,24 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
         dialog.findViewById<TextView>(R.id.tv_amount).text = modelList[pos].amount
         dialog.findViewById<TextView>(R.id.tv_date).text = modelList[pos].date
         dialog.findViewById<TextView>(R.id.tv_time).text = modelList[pos].time
-        dialog.findViewById<TextView>(R.id.tv_type).text = modelList[pos].spendType
+        val spendtype = modelList[pos].spendType
+        dialog.findViewById<TextView>(R.id.tv_type).text = spendtype
+        when (spendtype) {
+            "General" -> dialog.findViewById<ImageView>(R.id.iv_background)
+                .setImageResource(R.drawable.ic_rupees)
+            "Food" -> dialog.findViewById<ImageView>(R.id.iv_background)
+                .setImageResource(R.drawable.ic_food)
+            "Fuel" -> dialog.findViewById<ImageView>(R.id.iv_background)
+                .setImageResource(R.drawable.ic_fuel)
+            "Recharge" -> dialog.findViewById<ImageView>(R.id.iv_background)
+                .setImageResource(R.drawable.ic_recharge)
+            "Bills" -> dialog.findViewById<ImageView>(R.id.iv_background)
+                .setImageResource(R.drawable.ic_bill)
+            "Movies" -> dialog.findViewById<ImageView>(R.id.iv_background)
+                .setImageResource(R.drawable.ic_movies)
+            "Online Shopping" -> dialog.findViewById<ImageView>(R.id.iv_background)
+                .setImageResource(R.drawable.ic_shopping)
+        }
         dialog.show()
     }
 }

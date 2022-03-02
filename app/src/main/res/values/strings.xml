@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Spend Log</string>
+    <string name="signed_out">signout</string>
+    <string name="signed_in_fmt">Signed in as: %s</string>
 </resources>
