@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import com.app.spendlog.R
 import com.app.spendlog.adapter.SpendAdapter
@@ -22,8 +24,8 @@ import java.util.*
 class AddSpendBottomSheet : BottomSheetDialogFragment() {
     private var mSpendId = 0
     private val today = Calendar.getInstance()
-    private var mTime = SimpleDateFormat("hh:mm a").format(today.time)
-    private var mDate = SimpleDateFormat("MMM d, yyyy").format(today.time)
+    private var mTime = SimpleDateFormat("hh:mm a",Locale.ENGLISH).format(today.time)
+    private var mDate = SimpleDateFormat("MMM d, yyyy",Locale.ENGLISH).format(today.time)
     private val firebaseDatabase = FirebaseDatabase.getInstance()
     private val rootKey = firebaseDatabase.getReference("user1")
     private val spendKey = rootKey.child("spend")
@@ -49,9 +51,11 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
 
         init()
     }
-
+//TODO add custom icons for spend
     private fun init() {
-
+        val items = listOf("General","Food", "Fuel", "Recharge","Bills", "Movie","Online Shopping")
+        val adapter = ArrayAdapter(requireContext(), R.layout.item_spend_type, items)
+        (binding?.tlType?.editText as? AutoCompleteTextView)?.setAdapter(adapter)
         listeners()
         handleEvents()
     }
@@ -59,36 +63,14 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
 
     private fun handleEvents() {
         binding?.fabSave?.setOnClickListener {
-            val spendType = binding?.etSpendType?.text.toString()
-            val amount = binding?.etAmount?.text.toString()
+            val spendType = binding?.tlType?.editText?.text.toString()
+            Toast.makeText(requireContext(), "$spendType", Toast.LENGTH_SHORT).show()
+           /* val amount = binding?.etAmount?.text.toString()
             val d = mSpendId
 
             if (spendType.isEmpty() || amount.isEmpty() || mDate.isEmpty() || mTime.isEmpty()) {
                 Toast.makeText(requireContext(), "Fill All Data", Toast.LENGTH_SHORT).show()
             } else {
-                /*  spendKey.child(d.toString()).child("spendType").setValue(spendType)
-                      .addOnSuccessListener {
-                          spendKey.child(d.toString()).child("amount").setValue(amount)
-                              .addOnSuccessListener {
-                                  spendKey.child(d.toString()).child("date").setValue(mDate)
-                                      .addOnSuccessListener {
-                                          spendKey.child(d.toString()).child("time")
-                                              .setValue(mTime).addOnSuccessListener {
-                                              dialog?.dismiss()
-                                              Toast.makeText(
-                                                  requireContext(),
-                                                  "Added",
-                                                  Toast.LENGTH_SHORT
-                                              ).show()
-
-                                          }
-
-                                      }
-
-                              }
-
-                      }
-  */
                 spendKey.child(mSpendId.toString()).apply {
                     child("spendType").setValue(spendType)
                     child("amount").setValue(amount)
@@ -98,34 +80,19 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
                 dialog?.dismiss()
                 Toast.makeText(requireContext(), "Added", Toast.LENGTH_SHORT).show()
 
-            }
+            }*/
         }
     }
 
     private fun listeners() {
-   /*     spendKey.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val spendId = snapshot.childrenCount.toInt()
-                if (snapshot.exists()) {
-                    Log.d("SpendNN", spendId.toString())
-                    mSpendId = spendId + 1
-                } else
-                    mSpendId = 1
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-        })*/
-
-spendKey.get().addOnSuccessListener {
-   val spendId = it.childrenCount.toInt()
-    if (it.exists()) {
-        Log.d("SpendNN", spendId.toString())
-        mSpendId = spendId + 1
-    } else
-        mSpendId = 1
-}
+        spendKey.get().addOnSuccessListener {
+            val spendId = it.childrenCount.toInt()
+            if (it.exists()) {
+                Log.d("SpendNN", spendId.toString())
+                mSpendId = spendId + 1
+            } else
+                mSpendId = 1
+        }
 
         binding?.tpTime?.setOnTimeChangedListener { timePicker, hour, minute ->
             var hr = hour

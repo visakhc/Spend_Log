@@ -1,18 +1,24 @@
 package com.app.spendlog.ui
 //TODO Add an mBudget increment variable for easy access
 
+import android.app.Activity
+import android.app.Dialog
 import android.content.ContentValues.TAG
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.Window
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.app.spendlog.R
 import com.app.spendlog.adapter.SpendAdapter
 import com.app.spendlog.bottomsheets.AddSpendBottomSheet
 import com.app.spendlog.databinding.ActivityHomeBinding
 import com.app.spendlog.model.SpendModel
-import com.firebase.ui.database.SnapshotParser
 import com.google.firebase.database.*
 
 
@@ -78,31 +84,21 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
                 TODO("Not yet implemented")
             }
         }
-
         )
-/*
-        spendKey.get().addOnSuccessListener {
-            Log.d("GETFunc", it.childrenCount.toString())
-            val spendId = it.childrenCount.toInt()
-            if (it.exists()) {
-                getSpendData(spendId)
-            }
-        }*/
     }
 
 
     private fun getSpendData(spendCount: Int) {
         modelList.clear()
-        for (i in 1..spendCount) {
-            Log.d("spendSIze", "For loop $i")
-            spendKey.child(i.toString()).addValueEventListener(object : ValueEventListener {
+        for (id in 1..spendCount) {
+            Log.d("spendSIze", "For loop $id")
+            spendKey.child(id.toString()).addValueEventListener(object : ValueEventListener {
 
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot.exists()) {
                         Log.d("spendSIze", dataSnapshot.toString())
-
                         val user = dataSnapshot.getValue(SpendModel::class.java)
-                        modelList.add(user!!)
+                        modelList.asReversed().add(user!!)
                         setRecycler(modelList)
 
                     }
@@ -122,7 +118,6 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
 
     private fun handleEvents() {
         binding?.inclLayout?.ivSettings?.setOnClickListener {
-            getSpendID()
         }
         binding?.cvBudget?.setOnClickListener {
             binding?.cvAdd?.visibility = View.VISIBLE
@@ -145,10 +140,23 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
         binding?.tvAddSpend?.setOnClickListener {
             AddSpendBottomSheet().show(supportFragmentManager, "addSpent")
         }
-
     }
 
     override fun onEachClick(position: Int) {
-        Toast.makeText(this, "Hi----> $position", Toast.LENGTH_SHORT).show()
+        showPopup(position)
+    }
+
+    private fun showPopup(pos: Int) {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.setContentView(R.layout.dialog_layout)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.findViewById<TextView>(R.id.tv_amount).text = modelList[pos].amount
+        dialog.findViewById<TextView>(R.id.tv_date).text = modelList[pos].date
+        dialog.findViewById<TextView>(R.id.tv_time).text = modelList[pos].time
+        dialog.findViewById<TextView>(R.id.tv_type).text = modelList[pos].spendType
+        dialog.show()
     }
 }
