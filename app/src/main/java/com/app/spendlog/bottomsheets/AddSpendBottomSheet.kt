@@ -51,7 +51,7 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
 
         init()
     }
-//TODO add custom icons for spend
+
     private fun init() {
         val items = listOf("General","Food", "Fuel", "Recharge","Bills", "Movies","Online Shopping")
         val adapter = ArrayAdapter(requireContext(), R.layout.item_spend_type, items)

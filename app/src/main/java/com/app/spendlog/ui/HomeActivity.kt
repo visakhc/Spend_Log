@@ -3,7 +3,6 @@ package com.app.spendlog.ui
 
 import android.app.Dialog
 import android.content.ContentValues.TAG
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -15,36 +14,33 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.app.spendlog.LoginActivity
 import com.app.spendlog.R
 import com.app.spendlog.adapter.SpendAdapter
 import com.app.spendlog.bottomsheets.AddSpendBottomSheet
 import com.app.spendlog.databinding.ActivityHomeBinding
 import com.app.spendlog.model.SpendModel
+import com.app.spendlog.utils.SavedSession
+import com.bumptech.glide.Glide
 import com.google.firebase.database.*
 
 
 class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     private var mBudget = 0
     private var lastID = -1
-    var modelList = mutableListOf<SpendModel>()
+    private var modelList = mutableListOf<SpendModel>()
     private val firebaseDatabase = FirebaseDatabase.getInstance()
     private var rootKey = firebaseDatabase.getReference("user1")
     private val spendKey = rootKey.child("spend")
+    private val userId = SavedSession(this).getSharedString("userId")
+    private val userName = SavedSession(this).getSharedString("userName")
+    private val userPicture = SavedSession(this).getSharedString("userPic")
 
     private var binding: ActivityHomeBinding? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding?.root)
-
-        val intent = getIntent()
-        val userId = intent.getStringExtra("userId")
-        val userName = intent.getStringExtra("userName")
-        val userPicture = intent.getStringExtra("userPic")
-        Toast.makeText(this, "$userId--\n--$userName--\n--$userPicture", Toast.LENGTH_SHORT).show()
-//        rootKey = rootKey.child(userId)
-//add sharedpref TODO
+        rootKey = rootKey.child(userId)
 
         binding?.spendRecycler?.apply {
             setHasFixedSize(true)
@@ -56,25 +52,42 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     private fun init() {
         setBudget()
         getSpendID()
+        setNameImg()
         handleEvents()
+    }
+
+    private fun setNameImg() {
+        if (userPicture.length > 5) {
+            Glide.with(this)
+                .load(userPicture)
+                .into(binding?.inclLayout?.ivBack!!)
+        } else {
+            binding?.inclLayout?.ivBack?.setImageResource(R.drawable.ic_person)
+        }
     }
 
 
     private fun setBudget() {
+        val addedBudget = SavedSession(this).getSharedBoolean("BudgetAdded",false)
+
+        if (addedBudget){
         rootKey.child("budget").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val post = dataSnapshot.value.toString()
                 binding?.tvBudgetView?.text = post
                 binding?.tvBudget?.text = post
-
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
             }
         })
+        }
+        else{
+            binding?.clBudgetDialog?.visibility = View.VISIBLE
+        }
     }
-
+//TODO look if budget dialog click outside works
 
     fun getSpendID() {
         spendKey.addValueEventListener(object : ValueEventListener {
@@ -125,9 +138,18 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     }
 
     private fun handleEvents() {
-        binding?.inclLayout?.ivSettings?.setOnClickListener {
-            LoginActivity().signOut(this@HomeActivity)
+        binding?.submitBudget?.setOnClickListener {
+            binding?.clBudgetDialog?.visibility = View.GONE
+            SavedSession(this).putSharedBoolean("BudgetAdded",true)
+            setBudget()
         }
+        binding?.inclLayout?.ivSettings?.setOnClickListener {
+            Toast.makeText(this, userName, Toast.LENGTH_SHORT).show()
+        }
+        binding?.inclLayout?.ivBack?.setOnClickListener {
+            Toast.makeText(this, "Coming Soon....$userName", Toast.LENGTH_SHORT).show()
+        }
+
         binding?.cvBudget?.setOnClickListener {
             binding?.cvAdd?.visibility = View.VISIBLE
         }
@@ -160,7 +182,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(true)
         dialog.setCanceledOnTouchOutside(true)
-        dialog.setContentView(R.layout.dialog_layout)
+        dialog.setContentView(R.layout.dialog_item_layout)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.findViewById<TextView>(R.id.tv_amount).text = modelList[pos].amount
         dialog.findViewById<TextView>(R.id.tv_date).text = modelList[pos].date
