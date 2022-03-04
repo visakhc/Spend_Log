@@ -6,9 +6,9 @@
 
     <com.mikhaellopez.circularimageview.CircularImageView
         android:id="@+id/ivBack"
-        android:layout_width="@dimen/_25sdp"
-        android:layout_height="@dimen/_25sdp"
-        android:src="@drawable/ic_fuel"
+        android:layout_width="@dimen/_21sdp"
+        android:layout_height="@dimen/_21sdp"
+        android:src="@drawable/ic_person"
         android:layout_marginStart="@dimen/_3sdp"
         app:civ_border_color="@color/black"
         app:civ_border_width="1dp"

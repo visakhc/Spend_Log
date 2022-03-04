@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.spendlog.R
 import com.app.spendlog.adapter.SpendAdapter
 import com.app.spendlog.bottomsheets.AddSpendBottomSheet
+import com.app.spendlog.bottomsheets.SettingsBottomSheet
 import com.app.spendlog.databinding.ActivityHomeBinding
 import com.app.spendlog.model.SpendModel
 import com.app.spendlog.utils.SavedSession
@@ -29,17 +30,14 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     private var lastID = -1
     private var modelList = mutableListOf<SpendModel>()
     private val firebaseDatabase = FirebaseDatabase.getInstance()
-    private var rootKey = firebaseDatabase.getReference("user1")
+    private var rootKey = firebaseDatabase.getReference()
     private val spendKey = rootKey.child("spend")
-    private val userId = SavedSession(this).getSharedString("userId")
-    private val userName = SavedSession(this).getSharedString("userName")
-    private val userPicture = SavedSession(this).getSharedString("userPic")
-
     private var binding: ActivityHomeBinding? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding?.root)
+        val userId = SavedSession(this).getSharedString("userId")
         rootKey = rootKey.child(userId)
 
         binding?.spendRecycler?.apply {
@@ -57,6 +55,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     }
 
     private fun setNameImg() {
+        val userPicture = SavedSession(this).getSharedString("userPic")
         if (userPicture.length > 5) {
             Glide.with(this)
                 .load(userPicture)
@@ -66,24 +65,22 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
         }
     }
 
-
     private fun setBudget() {
-        val addedBudget = SavedSession(this).getSharedBoolean("BudgetAdded",false)
+        val addedBudget = SavedSession(this).getSharedBoolean("BudgetAdded", false)
 
-        if (addedBudget){
-        rootKey.child("budget").addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val post = dataSnapshot.value.toString()
-                binding?.tvBudgetView?.text = post
-                binding?.tvBudget?.text = post
-            }
+        if (addedBudget) {
+            rootKey.child("budget").addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val post = dataSnapshot.value.toString()
+                    binding?.tvBudgetView?.text = post
+                    binding?.tvBudget?.text = post
+                }
 
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-            }
-        })
-        }
-        else{
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+                }
+            })
+        } else {
             binding?.clBudgetDialog?.visibility = View.VISIBLE
         }
     }
@@ -112,19 +109,16 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     private fun getSpendData(spendCount: Int) {
         modelList.clear()
         for (id in 1..spendCount) {
-            Log.d("spendSIze", "For loop $id")
             spendKey.child(id.toString()).addValueEventListener(object : ValueEventListener {
 
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot.exists()) {
-                        Log.d("spendSIze", dataSnapshot.toString())
                         val user = dataSnapshot.getValue(SpendModel::class.java)
                         modelList.asReversed().add(user!!)
                         setRecycler(modelList)
 
                     }
                 }
-
                 override fun onCancelled(databaseError: DatabaseError) {
                     Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
                 }
@@ -139,14 +133,22 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
 
     private fun handleEvents() {
         binding?.submitBudget?.setOnClickListener {
-            binding?.clBudgetDialog?.visibility = View.GONE
-            SavedSession(this).putSharedBoolean("BudgetAdded",true)
-            setBudget()
+            val amount = binding?.etAmount?.text.toString()
+            if (amount.isNotEmpty()) {
+                rootKey.child("budget").setValue(amount).addOnSuccessListener {
+                    SavedSession(this).putSharedBoolean("BudgetAdded", true)
+                    setBudget()
+                    binding?.clBudgetDialog?.visibility = View.GONE
+                }
+            } else {
+                Log.d("ERROR", "HomeActivity line 48")
+            }
         }
         binding?.inclLayout?.ivSettings?.setOnClickListener {
-            Toast.makeText(this, userName, Toast.LENGTH_SHORT).show()
+            SettingsBottomSheet().show(supportFragmentManager, "Settings")
         }
         binding?.inclLayout?.ivBack?.setOnClickListener {
+            val userName = SavedSession(this).getSharedString("userName")
             Toast.makeText(this, "Coming Soon....$userName", Toast.LENGTH_SHORT).show()
         }
 

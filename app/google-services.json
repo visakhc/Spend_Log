@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "813163488203-8ibcihb0ah5erui5pu8sajb6ucuqmb97.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.spendlog",
+            "certificate_hash": "fa28fe6515c061d7625f4613f1e4a7d37c540ad1"
+          }
+        },
+        {
           "client_id": "813163488203-8q406a99rpl9vnpf3vpf9s9jchp6u8q9.apps.googleusercontent.com",
           "client_type": 3
         }

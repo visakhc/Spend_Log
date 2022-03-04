@@ -20,7 +20,7 @@ class LoginActivity : AppCompatActivity() {
 
     private val RC_SIGN_IN = 9001
     private var binding: ActivityLoginBinding? = null
-    private lateinit var mGoogleSignInClient: GoogleSignInClient
+    private  var mGoogleSignInClient: GoogleSignInClient?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun handleEvents() {
         binding?.signInButton?.setOnClickListener {
-            val intent = mGoogleSignInClient.signInIntent
+            val intent = mGoogleSignInClient?.signInIntent
             startActivityForResult(intent, RC_SIGN_IN)
         }
     }
@@ -62,6 +62,7 @@ class LoginActivity : AppCompatActivity() {
             val account = completedTask.getResult(ApiException::class.java)
             if (account != null) {
                 SavedSession(this).apply {
+
                     putSharedString("userId", account.email.toString())
                     putSharedString("userName", account.displayName.toString())
                     putSharedString("userPic", account.photoUrl.toString())
@@ -71,7 +72,7 @@ class LoginActivity : AppCompatActivity() {
                 startActivity(intent)
                 finish()
             } else
-                Toast.makeText(this, "Failed to Login", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Failed to Login", Toast.LENGTH_SHORT).show()
         } catch (e: ApiException) {
             Log.w("TAG", "signInResult:failed code=" + e.statusCode)
         }
