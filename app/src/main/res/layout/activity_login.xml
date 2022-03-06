@@ -11,21 +11,45 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/_200sdp"
         android:layout_marginTop="@dimen/_50sdp"
+        android:padding="40dp"
         android:src="@drawable/ic_rupee"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/black" />
 
-    <com.google.android.gms.common.SignInButton
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/sign_in_button"
-        style="@style/normalTextRegular"
-        android:layout_width="@dimen/_240sdp"
-        android:layout_height="@dimen/_45sdp"
+        style="@style/CardStyle"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_20sdp"
+
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="@dimen/_50sdp"
+                android:layout_height="@dimen/_50sdp"
+                android:padding="14dp"
+                app:srcCompat="@drawable/ic_google" />
+
+            <TextView
+                style="@style/normalTextMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/_5sdp"
+                android:text="Sign in with Google" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

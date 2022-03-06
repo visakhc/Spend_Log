@@ -10,7 +10,7 @@
         android:id="@+id/iv_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:alpha="0.09"
+        android:alpha="0.12"
         android:padding="@dimen/_40sdp"
         android:rotation="-25"
         android:scaleType="fitCenter"

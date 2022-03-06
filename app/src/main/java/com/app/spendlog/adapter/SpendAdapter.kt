@@ -15,8 +15,6 @@ class SpendAdapter(
     private var mOnEachListener: OnEachListener,
 ) :
     RecyclerView.Adapter<SpendAdapter.ViewHolder>() {
-    private val today = Calendar.getInstance().get(Calendar.DATE)
-    private val thisMonth = Calendar.getInstance().get(Calendar.MONTH)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view =

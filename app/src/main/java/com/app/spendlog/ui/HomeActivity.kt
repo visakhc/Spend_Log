@@ -9,9 +9,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.Window
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.spendlog.R
@@ -22,28 +20,35 @@ import com.app.spendlog.databinding.ActivityHomeBinding
 import com.app.spendlog.model.SpendModel
 import com.app.spendlog.utils.SavedSession
 import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.database.*
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.math.roundToInt
 
 
 class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
-    private var mBudget = 0
+    var mBudget = 0f
     private var lastID = -1
     private var modelList = mutableListOf<SpendModel>()
     private val firebaseDatabase = FirebaseDatabase.getInstance()
-    private var rootKey = firebaseDatabase.getReference()
-    private val spendKey = rootKey.child("spend")
+    private lateinit var rootKey: DatabaseReference
+
     private var binding: ActivityHomeBinding? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding?.root)
-        val userId = SavedSession(this).getSharedString("userId")
-        rootKey = rootKey.child(userId)
 
+        val userId = SavedSession(this).getSharedString("userId")
+        rootKey = firebaseDatabase.getReference(userId)
         binding?.spendRecycler?.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@HomeActivity)
         }
+        val dateFormat = SimpleDateFormat("MMMM", Locale.ENGLISH)
+        val currentMonth = dateFormat.format(Date()).uppercase(Locale.ENGLISH)
+        binding?.tvMonth?.text = currentMonth
         init()
     }
 
@@ -54,8 +59,27 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
         handleEvents()
     }
 
+    private fun setBalance() {
+
+        rootKey.child("totalspend").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    val totalSpend = dataSnapshot.value.toString()
+                    binding?.tvBalance?.text = (mBudget - totalSpend.toFloat()).toString()
+                } else {
+                    binding?.tvBalance?.text = mBudget.toString()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
+    }
+
     private fun setNameImg() {
         val userPicture = SavedSession(this).getSharedString("userPic")
+
         if (userPicture.length > 5) {
             Glide.with(this)
                 .load(userPicture)
@@ -66,40 +90,47 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     }
 
     private fun setBudget() {
-        val addedBudget = SavedSession(this).getSharedBoolean("BudgetAdded", false)
 
-        if (addedBudget) {
-            rootKey.child("budget").addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
+        rootKey.child("budget").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                Log.d("GAuthResp", dataSnapshot.value.toString())
+                if (dataSnapshot.exists()) {
                     val post = dataSnapshot.value.toString()
-                    binding?.tvBudgetView?.text = post
-                    binding?.tvBudget?.text = post
+                    mBudget = post.toFloat()
+                    binding?.tvBudgetView?.text = post.toString()
+                    setBalance()
+                } else {
+                    showBudgetDialog()
                 }
+            }
 
-                override fun onCancelled(databaseError: DatabaseError) {
-                    Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-                }
-            })
-        } else {
-            binding?.clBudgetDialog?.visibility = View.VISIBLE
-        }
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.w("GAuthResp", "loadPost:onCancelled", databaseError.toException())
+            }
+        })
     }
-//TODO look if budget dialog click outside works
 
-    fun getSpendID() {
-        spendKey.addValueEventListener(object : ValueEventListener {
+    private fun getSpendID() {
+        rootKey.child("spend").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val spendId = snapshot.childrenCount.toInt()
                 if (snapshot.exists() && spendId != lastID) {
+                    if (binding?.lottieView?.visibility == View.VISIBLE) {
+                        binding?.lottieView?.visibility = View.GONE
+                        binding?.tvMessage?.visibility = View.GONE
+                    }
                     lastID = spendId
                     getSpendData(spendId)
                 } else {
-                    Log.d("INNN", "Dont Mind Error")
+                    if (binding?.lottieView?.visibility == View.GONE) {
+                        binding?.lottieView?.visibility = View.VISIBLE
+                        binding?.tvMessage?.visibility = View.VISIBLE
+                    }
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+
             }
         }
         )
@@ -109,41 +140,38 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     private fun getSpendData(spendCount: Int) {
         modelList.clear()
         for (id in 1..spendCount) {
-            spendKey.child(id.toString()).addValueEventListener(object : ValueEventListener {
+            rootKey.child("spend").child(id.toString())
+                .addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            val user = dataSnapshot.getValue(SpendModel::class.java)
+                            modelList.asReversed().add(user!!)
+                            if (binding?.lottieView?.visibility == View.VISIBLE) {
+                                binding?.lottieView?.visibility = View.GONE
+                                binding?.tvMessage?.visibility = View.GONE
+                            }
+                            setRecycler(modelList)
 
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        val user = dataSnapshot.getValue(SpendModel::class.java)
-                        modelList.asReversed().add(user!!)
-                        setRecycler(modelList)
-
+                        } else {
+                            Log.w("ERROR", "Error near line 136 HomeActivity")
+                        }
                     }
-                }
-                override fun onCancelled(databaseError: DatabaseError) {
-                    Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-                }
-            })
+
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+                    }
+                })
         }
 
     }
 
+    //TOdo add functionality to delete a spend and make some of these functions to a constructor
     fun setRecycler(model: MutableList<SpendModel>) {
         binding?.spendRecycler?.adapter = SpendAdapter(model, this@HomeActivity)
     }
 
     private fun handleEvents() {
-        binding?.submitBudget?.setOnClickListener {
-            val amount = binding?.etAmount?.text.toString()
-            if (amount.isNotEmpty()) {
-                rootKey.child("budget").setValue(amount).addOnSuccessListener {
-                    SavedSession(this).putSharedBoolean("BudgetAdded", true)
-                    setBudget()
-                    binding?.clBudgetDialog?.visibility = View.GONE
-                }
-            } else {
-                Log.d("ERROR", "HomeActivity line 48")
-            }
-        }
+
         binding?.inclLayout?.ivSettings?.setOnClickListener {
             SettingsBottomSheet().show(supportFragmentManager, "Settings")
         }
@@ -151,13 +179,18 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
             val userName = SavedSession(this).getSharedString("userName")
             Toast.makeText(this, "Coming Soon....$userName", Toast.LENGTH_SHORT).show()
         }
+        binding?.tvMonth?.setOnClickListener {
+            val userName = SavedSession(this).getSharedString("userName")
+            Toast.makeText(this, "Coming Soon....$userName", Toast.LENGTH_SHORT).show()
+        }
 
         binding?.cvBudget?.setOnClickListener {
-            binding?.cvAdd?.visibility = View.VISIBLE
+            showBudgetDialog()
         }
         binding?.homeLayout?.setOnClickListener {
-            if (binding?.cvAdd?.visibility == View.VISIBLE) {
-                binding?.cvAdd?.visibility = View.GONE
+            if (binding?.ivPlus?.visibility == View.VISIBLE) {
+                binding?.ivPlus?.visibility = View.GONE
+                binding?.ivMinus?.visibility = View.GONE
             }
         }
         binding?.ivPlus?.setOnClickListener {
@@ -171,7 +204,12 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
             }
         }
         binding?.tvAddSpend?.setOnClickListener {
-            AddSpendBottomSheet().show(supportFragmentManager, "addSpent")
+            if (binding?.tvBudgetView?.text == "0") {
+                Snackbar.make(this, it, "Add your Monthly Budget First !!", Snackbar.LENGTH_SHORT)
+                    .show()
+            } else {
+                AddSpendBottomSheet().show(supportFragmentManager, "addSpent")
+            }
         }
     }
 
@@ -206,6 +244,33 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
                 .setImageResource(R.drawable.ic_movies)
             "Online Shopping" -> dialog.findViewById<ImageView>(R.id.iv_background)
                 .setImageResource(R.drawable.ic_shopping)
+        }
+        dialog.show()
+    }
+
+    private fun showBudgetDialog() {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.setContentView(R.layout.dialog_set_budget)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.findViewById<EditText>(R.id.et_add_amount).setText(mBudget.toString())
+        dialog.findViewById<ImageView>(R.id.submit_budget).setOnClickListener {
+            val amt = dialog.findViewById<EditText>(R.id.et_add_amount).text.toString()
+            if (amt.isNullOrEmpty()) {
+                dialog.dismiss()
+            } else {
+                if (amt.isNotEmpty()) {
+                    rootKey.child("budget").setValue(amt).addOnSuccessListener {
+                        dialog.dismiss()
+                        setBudget()
+                        setBalance()
+                    }
+                } else {
+                    Log.d("ERROR", "HomeActivity line 241")
+                }
+            }
         }
         dialog.show()
     }

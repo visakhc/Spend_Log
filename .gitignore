@@ -13,3 +13,9 @@
 .externalNativeBuild
 .cxx
 local.properties
+misc.xml
+deploymentTargetDropDown.xml
+render.experimental.xml
+google-services.json
+*.hprof
+output.json

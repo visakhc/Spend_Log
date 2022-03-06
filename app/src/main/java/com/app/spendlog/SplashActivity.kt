@@ -14,9 +14,7 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
 
         val userId = SavedSession(this).getSharedString("userId")
-
         if (userId.isEmpty() || userId == "notfound" || userId.isBlank()) {
-            Log.d("ERROR", "Error---->SharedPreferences is empty")
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finish()

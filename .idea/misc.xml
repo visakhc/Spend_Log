@@ -16,8 +16,10 @@
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log/app/src/main/res/layout/activity_home.xml" value="0.35052083333333334" />
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log/app/src/main/res/layout/activity_login.xml" value="0.35052083333333334" />
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log/app/src/main/res/layout/activity_main.xml" value="0.5233281493001555" />
+        <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log/app/src/main/res/layout/activity_testing.xml" value="0.1734375" />
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log/app/src/main/res/layout/bottomsheet_add_spend.xml" value="0.35052083333333334" />
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log/app/src/main/res/layout/bottomsheet_settings.xml" value="0.35052083333333334" />
+        <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log/app/src/main/res/layout/dialog_item_layout.xml" value="0.35052083333333334" />
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log/app/src/main/res/layout/dialog_layout.xml" value="0.35052083333333334" />
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log/app/src/main/res/layout/dialog_set_budget.xml" value="0.25" />
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log/app/src/main/res/layout/item_spend.xml" value="0.35052083333333334" />
@@ -26,9 +28,6 @@
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log_office_version/app/src/main/res/layout/activity_home.xml" value="0.35052083333333334" />
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log_office_version/app/src/main/res/layout/bottomsheet_add_spend.xml" value="0.35052083333333334" />
         <entry key="..\:/Users/Meridian/Desktop/AndroidProjects/Spend-Log/app/src/main/res/layout/activity_home.xml" value="0.36666666666666664" />
-        <entry key="app/src/main/res/layout/activity_home.xml" value="0.21822916666666667" />
-        <entry key="app/src/main/res/layout/activity_login.xml" value="0.21822916666666667" />
-        <entry key="app/src/main/res/layout/toolbar_general.xml" value="0.4036458333333333" />
       </map>
     </option>
   </component>

@@ -16,71 +16,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_budget_dialog"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#B2000000"
-        android:clickable="false"
-        android:elevation="@dimen/_20sdp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="@dimen/_160sdp"
-            android:layout_height="@dimen/_160sdp"
-            android:clickable="true"
-            app:cardCornerRadius="25dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-
-                <EditText
-                    android:id="@+id/et_amount"
-                    style="@style/normalTextRegular"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:drawableEnd="@drawable/ic_rupee"
-                    android:hint="type your budget"
-                    android:maxLines="1"
-
-                    android:paddingStart="@dimen/_6sdp"
-                    android:textColor="@color/black"
-                    android:textColorHint="@color/black"
-                    app:drawableTint="@color/black"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:id="@+id/submit_budget"
-                    android:layout_width="@dimen/_40sdp"
-                    android:layout_height="@dimen/_40sdp"
-                    android:clickable="true"
-                    android:padding="@dimen/_10sdp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@id/et_amount"
-                    app:layout_constraintStart_toStartOf="@id/et_amount"
-                    app:layout_constraintTop_toBottomOf="@+id/et_amount"
-                    app:srcCompat="@drawable/ic_tick_mark"
-                    app:tint="@color/lime_green" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
     <include
         android:id="@+id/incl_layout"
         layout="@layout/toolbar_general"
@@ -92,6 +27,7 @@
         android:id="@+id/cv_budget"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/_120sdp"
+        android:layout_marginHorizontal="@dimen/_10sdp"
         android:outlineSpotShadowColor="@color/blue"
         android:visibility="visible"
         app:cardCornerRadius="30dp"
@@ -100,83 +36,66 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/guideline2">
 
-        <TextView
-            style="@style/normalTextRegular"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/_8sdp"
-            android:text="Budget"
-            android:textColor="@color/black" />
-
-        <TextView
-            android:id="@+id/tv_budget_view"
-            style="@style/extraLargeTextMedium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginHorizontal="@dimen/_50sdp"
-            android:text="0.0"
-            android:textSize="@dimen/_40ssp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </com.google.android.material.card.MaterialCardView>
-
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cv_add"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/_125sdp"
-        android:visibility="gone"
-        app:cardCornerRadius="30dp"
-        app:cardElevation="50dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/guideline2">
-
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/iv_minus"
+            <TextView
+                style="@style/normalTextRegular"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_40sdp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/tv_budget"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:layout_marginBottom="@dimen/_15sdp"
+                android:text="Budget"
+                android:textColor="@color/black"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_remove"
-                app:tint="@color/dodger_blue" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/tv_budget"
+                android:id="@+id/tv_budget_view"
                 style="@style/extraLargeTextMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="0.0"
+                android:layout_marginHorizontal="@dimen/_60sdp"
+                android:text="0"
+                android:textSize="@dimen/_40ssp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
+                android:id="@+id/iv_minus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_20sdp"
+                android:padding="5dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/tv_budget_view"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_remove"
+                app:tint="@color/dodger_blue" />
+
+            <ImageView
                 android:id="@+id/iv_plus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/_40sdp"
+                android:layout_marginHorizontal="@dimen/_20sdp"
+                android:padding="5dp"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/tv_budget"
+                app:layout_constraintStart_toEndOf="@+id/tv_budget_view"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_add"
                 app:tint="@color/dodger_blue" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView
@@ -227,25 +146,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_20sdp"
-                android:text="Bal.  Rs " />
+                android:text="Bal. Rs " />
 
             <TextView
                 style="@style/normalTextRegular"
                 android:layout_width="wrap_content"
+                android:id="@+id/tv_balance"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/_20sdp"
-                android:text="7599.00" />
+                android:text="------" />
         </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>
 
     <TextView
+        android:id="@+id/tv_month"
         style="@style/normalTextRegular"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="1dp"
         android:text="MARCH"
-        app:layout_constraintBottom_toTopOf="@+id/spend_recycler"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -253,14 +174,43 @@
         android:id="@+id/spend_recycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/_50sdp"
+        android:layout_marginTop="@dimen/_10sdp"
         android:clipToPadding="false"
         android:overScrollMode="never"
         android:paddingBottom="@dimen/_60sdp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cv_balance" />
+        app:layout_constraintTop_toBottomOf="@+id/guideline3" />
+
+    <TextView
+        android:id="@+id/tv_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:fontFamily="@font/poppin_light"
+        android:text="Add your Spending to See the Insight"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toTopOf="@+id/lottieView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieView"
+        android:layout_width="@dimen/_150sdp"
+        android:layout_height="@dimen/_100sdp"
+        android:layout_marginEnd="@dimen/_20sdp"
+        android:padding="12dp"
+        android:rotation="45"
+        android:visibility="gone"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toTopOf="@+id/tv_add_spend"
+        app:layout_constraintEnd_toEndOf="@+id/tv_add_spend"
+        app:layout_constraintStart_toStartOf="@+id/tv_add_spend"
+        app:lottie_autoPlay="true"
+        app:lottie_fileName="arrow.json"
+        app:lottie_loop="true"
+        app:lottie_speed="0.8" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideCenter"
@@ -268,5 +218,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.35" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
