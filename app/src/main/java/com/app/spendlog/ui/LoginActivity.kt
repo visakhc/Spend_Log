@@ -22,7 +22,6 @@ import java.security.MessageDigest
 
 
 class LoginActivity : AppCompatActivity() {
-
     private val RC_SIGN_IN = 9001
     private var binding: ActivityLoginBinding? = null
     private var mGoogleSignInClient: GoogleSignInClient? = null
@@ -43,15 +42,6 @@ class LoginActivity : AppCompatActivity() {
         handleEvents()
     }
 
-    fun signOut() {
-
-        mGoogleSignInClient?.signOut()?.addOnSuccessListener {
-            LogUtil("----Success")
-
-        }?.addOnFailureListener {
-            LogUtil(it.message.toString())
-        }
-    }
     //Fix Logout TODO
 
     private fun handleEvents() {
