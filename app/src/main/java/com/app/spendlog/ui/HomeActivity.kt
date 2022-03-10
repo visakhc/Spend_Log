@@ -18,13 +18,13 @@ import com.app.spendlog.bottomsheets.AddSpendBottomSheet
 import com.app.spendlog.bottomsheets.SettingsBottomSheet
 import com.app.spendlog.databinding.ActivityHomeBinding
 import com.app.spendlog.model.SpendModel
+import com.app.spendlog.utils.LogUtil
 import com.app.spendlog.utils.SavedSession
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.database.*
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.roundToInt
 
 
 class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
@@ -180,8 +180,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
             Toast.makeText(this, "Coming Soon....$userName", Toast.LENGTH_SHORT).show()
         }
         binding?.tvMonth?.setOnClickListener {
-            val userName = SavedSession(this).getSharedString("userName")
-            Toast.makeText(this, "Coming Soon....$userName", Toast.LENGTH_SHORT).show()
+            showDatePickerDialog()
         }
 
         binding?.cvBudget?.setOnClickListener {
@@ -214,10 +213,10 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     }
 
     override fun onEachClick(position: Int) {
-        showPopup(position)
+        showRecyclerItemPopup(position)
     }
 
-    private fun showPopup(pos: Int) {
+    private fun showRecyclerItemPopup(pos: Int) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(true)
@@ -244,6 +243,36 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
                 .setImageResource(R.drawable.ic_movies)
             "Online Shopping" -> dialog.findViewById<ImageView>(R.id.iv_background)
                 .setImageResource(R.drawable.ic_shopping)
+        }
+        dialog.show()
+    }
+
+    private fun showDatePickerDialog() {
+        val items =
+            arrayOf("Juary", "Fe", "Fuel", "Recharge", "Bills", "Movies", "Online Shopping")
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.setContentView(R.layout.dialog_date_selector)
+    //    dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val monthPicker = dialog.findViewById<NumberPicker>(R.id.picker_month)
+        monthPicker.setDisplayedValues (items)
+        //resources.getStringArray(R.array.months_array)
+        private String[]  pickerVals;
+        = new String[] {"dog", "cat", "lizard", "turtle", "axolotl"};
+
+        val yearPicker = dialog.findViewById<NumberPicker>(R.id.picker_year)
+        yearPicker.apply {
+            minValue = 1900
+            maxValue = 2900
+            value = 2022
+        }
+        monthPicker.setOnValueChangedListener { picker, i, i2 ->
+            LogUtil(monthPicker.value.toString())
+            LogUtil(picker.value.toString())
+            LogUtil(i.toString())
+            LogUtil(i2.toString())
         }
         dialog.show()
     }
