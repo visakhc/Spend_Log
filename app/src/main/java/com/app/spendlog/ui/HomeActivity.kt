@@ -11,6 +11,7 @@ import android.view.View
 import android.view.Window
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.spendlog.R
 import com.app.spendlog.adapter.SpendAdapter
@@ -33,6 +34,12 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     private var modelList = mutableListOf<SpendModel>()
     private val firebaseDatabase = FirebaseDatabase.getInstance()
     private lateinit var rootKey: DatabaseReference
+
+    private val today = Calendar.getInstance()
+
+    private var year = today.get(Calendar.YEAR)
+    private var month = today.get(Calendar.MONTH)
+    val day = today.get(Calendar.DAY_OF_MONTH
 
     private var binding: ActivityHomeBinding? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +67,6 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     }
 
     private fun setBalance() {
-
         rootKey.child("totalspend").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -71,9 +77,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
                 }
             }
 
-            override fun onCancelled(error: DatabaseError) {
-
-            }
+            override fun onCancelled(error: DatabaseError) {}
         })
     }
 
@@ -113,14 +117,14 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     private fun getSpendID() {
         rootKey.child("spend").addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val spendId = snapshot.childrenCount.toInt()
-                if (snapshot.exists() && spendId != lastID) {
+                val spendCount = snapshot.childrenCount.toInt()
+                if (snapshot.exists() && spendCount != lastID) {
                     if (binding?.lottieView?.visibility == View.VISIBLE) {
                         binding?.lottieView?.visibility = View.GONE
                         binding?.tvMessage?.visibility = View.GONE
                     }
-                    lastID = spendId
-                    getSpendData(spendId)
+                    lastID = spendCount
+                    getSpendData(spendCount)
                 } else {
                     if (binding?.lottieView?.visibility == View.GONE) {
                         binding?.lottieView?.visibility = View.VISIBLE
@@ -135,7 +139,6 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
         }
         )
     }
-
 
     private fun getSpendData(spendCount: Int) {
         modelList.clear()
@@ -248,32 +251,37 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     }
 
     private fun showDatePickerDialog() {
-        val items =
-            arrayOf("Juary", "Fe", "Fuel", "Recharge", "Bills", "Movies", "Online Shopping")
+        val items = resources.getStringArray(R.array.months_array)
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(true)
         dialog.setCanceledOnTouchOutside(true)
         dialog.setContentView(R.layout.dialog_date_selector)
-    //    dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
         val monthPicker = dialog.findViewById<NumberPicker>(R.id.picker_month)
-        monthPicker.setDisplayedValues (items)
-        //resources.getStringArray(R.array.months_array)
-        private String[]  pickerVals;
-        = new String[] {"dog", "cat", "lizard", "turtle", "axolotl"};
+        monthPicker.apply {
+            minValue = 0
+            maxValue = items.size - 1
+            displayedValues = items
+            value = month
+        }
 
         val yearPicker = dialog.findViewById<NumberPicker>(R.id.picker_year)
         yearPicker.apply {
             minValue = 1900
             maxValue = 2900
-            value = 2022
+            value = year
         }
-        monthPicker.setOnValueChangedListener { picker, i, i2 ->
-            LogUtil(monthPicker.value.toString())
-            LogUtil(picker.value.toString())
-            LogUtil(i.toString())
-            LogUtil(i2.toString())
+
+        monthPicker.setOnValueChangedListener { picker, _, _ ->
+            month = picker.value
         }
+
+        yearPicker.setOnValueChangedListener { picker, _, _ ->
+            year = picker.value
+        }
+
         dialog.show()
     }
 

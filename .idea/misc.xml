@@ -19,7 +19,6 @@
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log/app/src/main/res/layout/activity_testing.xml" value="0.1734375" />
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log/app/src/main/res/layout/bottomsheet_add_spend.xml" value="0.35052083333333334" />
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log/app/src/main/res/layout/bottomsheet_settings.xml" value="0.35052083333333334" />
-        <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log/app/src/main/res/layout/dialog_date_selector.xml" value="0.35052083333333334" />
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log/app/src/main/res/layout/dialog_item_layout.xml" value="0.35052083333333334" />
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log/app/src/main/res/layout/dialog_layout.xml" value="0.35052083333333334" />
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log/app/src/main/res/layout/dialog_set_budget.xml" value="0.25" />
@@ -29,7 +28,10 @@
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log_office_version/app/src/main/res/layout/activity_home.xml" value="0.35052083333333334" />
         <entry key="..\:/Users/LENOVO/AndroidStudioProjects/Spend_Log_office_version/app/src/main/res/layout/bottomsheet_add_spend.xml" value="0.35052083333333334" />
         <entry key="..\:/Users/Meridian/Desktop/AndroidProjects/Spend-Log/app/src/main/res/layout/activity_home.xml" value="0.36666666666666664" />
+        <entry key="app/src/main/res/layout/activity_home.xml" value="0.2640625" />
+        <entry key="app/src/main/res/layout/activity_testing.xml" value="0.2520833333333333" />
         <entry key="app/src/main/res/layout/bottomsheet_add_spend.xml" value="0.334375" />
+        <entry key="app/src/main/res/layout/dialog_date_selector.xml" value="0.75" />
       </map>
     </option>
   </component>
