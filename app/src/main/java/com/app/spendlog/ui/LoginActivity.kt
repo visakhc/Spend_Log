@@ -6,13 +6,11 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.app.spendlog.databinding.ActivityLoginBinding
-import com.app.spendlog.utils.LogUtil
 import com.app.spendlog.utils.SavedSession
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.ktx.auth
@@ -42,7 +40,6 @@ class LoginActivity : AppCompatActivity() {
         handleEvents()
     }
 
-    //Fix Logout TODO
 
     private fun handleEvents() {
         binding?.signInButton?.setOnClickListener {

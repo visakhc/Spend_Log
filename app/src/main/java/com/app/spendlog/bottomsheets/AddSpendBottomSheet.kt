@@ -1,5 +1,6 @@
 package com.app.spendlog.bottomsheets
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,6 +16,7 @@ import com.app.spendlog.ui.HomeActivity
 import com.app.spendlog.utils.LogUtil
 import com.app.spendlog.utils.SavedSession
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.database.*
 import java.text.DateFormatSymbols
 import java.text.SimpleDateFormat
@@ -22,7 +24,7 @@ import java.util.*
 import kotlin.math.roundToInt
 
 class AddSpendBottomSheet : BottomSheetDialogFragment() {
-    private var mSpendId = 1
+    // private var mSpendId = 1
     private val today = Calendar.getInstance()
 
     private var mTime = SimpleDateFormat("hh:mm a", Locale.ENGLISH).format(today.time)
@@ -66,49 +68,51 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
 
     private fun handleEvents() {
         binding?.fabSave?.setOnClickListener {
-            val mMonth = binding?.dpDate?.month
-            val mYear = binding?.dpDate?.year
-            val mDay = binding?.dpDate?.dayOfMonth
-            val month = DateFormatSymbols().shortMonths[mMonth!!]
+            val mMonth = binding?.dpDate?.month.toString()
+            val mYear = binding?.dpDate?.year.toString()
+            val mDay = binding?.dpDate?.dayOfMonth.toString()
+            val month = DateFormatSymbols().shortMonths[mMonth.toInt()]
             val mDate = "$month $mDay, $mYear"
             val spendType = binding?.tlType?.editText?.text.toString()
             val amount = binding?.etAmount?.text.toString()
 
-            if (spendType.isEmpty() || amount.isEmpty() || mDate.isEmpty() || mTime.isEmpty() || mSpendId < 0) {
+            if (spendType.isEmpty() || amount.isEmpty() || mDate.isEmpty() || mTime.isEmpty()/* || mSpendId < 0*/) {
                 Toast.makeText(requireContext(), "Fill All Data", Toast.LENGTH_SHORT).show()
             } else {
-                val timestamp = "$mDay$mMonth$mYear"
-                rootKey.child("spend").child(mSpendId.toString()).apply {
-                    child("spendType").setValue(spendType)
-                    child("amount").setValue(amount)
-                    child("date").setValue(mDate)
-                    child("time").setValue(mTime)
-                    child("timestamp").setValue(timestamp)
+                rootKey.child("spend").child(mYear).child(mMonth).get().addOnSuccessListener {
+                        val spendId = it.childrenCount.toInt()
+                        rootKey.child("spend")
+                            .child(mYear)
+                            .child(mMonth)
+                            .child((spendId + 1).toString()).apply {
+                                child("spendType").setValue(spendType)
+                                child("amount").setValue(amount)
+                                child("date").setValue(mDate)
+                                child("time").setValue(mTime)
+                                child("day").setValue(mDay)
+                                child("month").setValue(mMonth)
+                                child("year").setValue(mYear).addOnSuccessListener {
+                                    rootKey.child("totalspend").get().addOnSuccessListener {
+                                        if (it.exists()) {
+                                            val lastTotal = it.value.toString()
+                                            rootKey.child("totalspend")
+                                                .setValue(lastTotal.toFloat() + amount.toFloat())
+                                        } else {
+                                            rootKey.child("totalspend").setValue(amount)
+                                        }
+                                    }
+                                    dialog?.dismiss()
+                                    Toast.makeText(requireContext(), "Added", Toast.LENGTH_SHORT)
+                                        .show()
+                                }
+                            }
                 }
-                rootKey.child("totalspend").get().addOnSuccessListener {
-                    if (it.exists()) {
-                        val lastTotal = it.value.toString()
-                        rootKey.child("totalspend").setValue(lastTotal.toFloat() + amount.toFloat())
-                    } else {
-                        rootKey.child("totalspend").setValue(amount)
-                    }
-                }
-                dialog?.dismiss()
-                Toast.makeText(requireContext(), "Added", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
 
-
     private fun listeners() {
-        rootKey.child("spend").get().addOnSuccessListener {
-            if (it.exists()) {
-                val spendId = it.childrenCount.toInt()
-                mSpendId = spendId + 1
-            } else
-                mSpendId = 1
-        }
 
         binding?.tpTime?.setOnTimeChangedListener { timePicker, hour, minute ->
             var hr = hour

@@ -1,5 +1,4 @@
 package com.app.spendlog.ui
-//TODO Add an mBudget increment variable for easy access
 
 import android.app.Dialog
 import android.content.ContentValues.TAG
@@ -9,9 +8,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.Window
+import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.spendlog.R
 import com.app.spendlog.adapter.SpendAdapter
@@ -30,16 +29,17 @@ import java.util.*
 
 class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     var mBudget = 0f
-    private var lastID = -1
+
+    //    private var lastID = -1
     private var modelList = mutableListOf<SpendModel>()
     private val firebaseDatabase = FirebaseDatabase.getInstance()
     private lateinit var rootKey: DatabaseReference
 
     private val today = Calendar.getInstance()
 
-    private var year = today.get(Calendar.YEAR)
-    private var month = today.get(Calendar.MONTH)
-    val day = today.get(Calendar.DAY_OF_MONTH
+    private var mYear = today.get(Calendar.YEAR)
+    private var mMonth = today.get(Calendar.MONTH)
+    //  val day = today.get(Calendar.DAY_OF_MONTH)
 
     private var binding: ActivityHomeBinding? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +53,8 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@HomeActivity)
         }
+        //todo fix setrefreshlayout
+        binding?.swipeHomeLayout?.setDistanceToTriggerSync(800)
         val dateFormat = SimpleDateFormat("MMMM", Locale.ENGLISH)
         val currentMonth = dateFormat.format(Date()).uppercase(Locale.ENGLISH)
         binding?.tvMonth?.text = currentMonth
@@ -61,7 +63,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
 
     private fun init() {
         setBudget()
-        getSpendID()
+        getSpendItemCount()
         setNameImg()
         handleEvents()
     }
@@ -114,36 +116,44 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
         })
     }
 
-    private fun getSpendID() {
-        rootKey.child("spend").addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val spendCount = snapshot.childrenCount.toInt()
-                if (snapshot.exists() && spendCount != lastID) {
-                    if (binding?.lottieView?.visibility == View.VISIBLE) {
-                        binding?.lottieView?.visibility = View.GONE
-                        binding?.tvMessage?.visibility = View.GONE
-                    }
-                    lastID = spendCount
-                    getSpendData(spendCount)
-                } else {
-                    if (binding?.lottieView?.visibility == View.GONE) {
-                        binding?.lottieView?.visibility = View.VISIBLE
-                        binding?.tvMessage?.visibility = View.VISIBLE
+    private fun getSpendItemCount() {
+        var lastID = -1
+        LogUtil("dpend $mYear --- $mMonth")
+        rootKey.child("spend").child(mYear.toString()).child(mMonth.toString())
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val spendCount = snapshot.childrenCount.toInt()
+                    if (snapshot.exists() && spendCount != lastID) {
+                        if (binding?.lottieView?.visibility == View.VISIBLE) {
+                            binding?.lottieView?.visibility = View.GONE
+                            binding?.tvMessage?.visibility = View.GONE
+                        }
+                        lastID = spendCount
+                        getSpendData(spendCount)
+                    } else {
+                        modelList.clear()
+                        binding?.spendRecycler?.adapter?.notifyDataSetChanged()
+                        if (binding?.lottieView?.visibility == View.GONE) {
+                            binding?.lottieView?.visibility = View.VISIBLE
+                            binding?.tvMessage?.visibility = View.VISIBLE
+                        }
                     }
                 }
-            }
 
-            override fun onCancelled(error: DatabaseError) {
+                override fun onCancelled(error: DatabaseError) {
 
+                }
             }
-        }
-        )
+            )
     }
 
     private fun getSpendData(spendCount: Int) {
         modelList.clear()
         for (id in 1..spendCount) {
-            rootKey.child("spend").child(id.toString())
+            rootKey.child("spend")
+                .child(mYear.toString())
+                .child(mMonth.toString())
+                .child(id.toString())
                 .addValueEventListener(object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
                         if (dataSnapshot.exists()) {
@@ -153,7 +163,10 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
                                 binding?.lottieView?.visibility = View.GONE
                                 binding?.tvMessage?.visibility = View.GONE
                             }
-                            setRecycler(modelList)
+                            if (modelList.size == spendCount) {
+                                setRecycler(modelList)
+                            }
+
 
                         } else {
                             Log.w("ERROR", "Error near line 136 HomeActivity")
@@ -164,6 +177,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
                         Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
                     }
                 })
+
         }
 
     }
@@ -171,10 +185,13 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     //TOdo add functionality to delete a spend and make some of these functions to a constructor
     fun setRecycler(model: MutableList<SpendModel>) {
         binding?.spendRecycler?.adapter = SpendAdapter(model, this@HomeActivity)
+        binding?.spendRecycler?.adapter?.notifyItemRangeChanged(0, model.size)
     }
 
     private fun handleEvents() {
-
+        binding?.swipeHomeLayout?.setOnRefreshListener {
+            recreate()
+        }
         binding?.inclLayout?.ivSettings?.setOnClickListener {
             SettingsBottomSheet().show(supportFragmentManager, "Settings")
         }
@@ -189,22 +206,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
         binding?.cvBudget?.setOnClickListener {
             showBudgetDialog()
         }
-        binding?.homeLayout?.setOnClickListener {
-            if (binding?.ivPlus?.visibility == View.VISIBLE) {
-                binding?.ivPlus?.visibility = View.GONE
-                binding?.ivMinus?.visibility = View.GONE
-            }
-        }
-        binding?.ivPlus?.setOnClickListener {
-            mBudget += 500
-            rootKey.child("budget").setValue(mBudget.toString())
-        }
-        binding?.ivMinus?.setOnClickListener {
-            while (mBudget >= 500) {
-                mBudget -= 500
-                rootKey.child("budget").setValue(mBudget.toString())
-            }
-        }
+
         binding?.tvAddSpend?.setOnClickListener {
             if (binding?.tvBudgetView?.text == "0") {
                 Snackbar.make(this, it, "Add your Monthly Budget First !!", Snackbar.LENGTH_SHORT)
@@ -231,22 +233,17 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
         dialog.findViewById<TextView>(R.id.tv_time).text = modelList[pos].time
         val spendtype = modelList[pos].spendType
         dialog.findViewById<TextView>(R.id.tv_type).text = spendtype
+        val imgBack = dialog.findViewById<ImageView>(R.id.iv_background)
         when (spendtype) {
-            "General" -> dialog.findViewById<ImageView>(R.id.iv_background)
-                .setImageResource(R.drawable.ic_rupees)
-            "Food" -> dialog.findViewById<ImageView>(R.id.iv_background)
-                .setImageResource(R.drawable.ic_food)
-            "Fuel" -> dialog.findViewById<ImageView>(R.id.iv_background)
-                .setImageResource(R.drawable.ic_fuel)
-            "Recharge" -> dialog.findViewById<ImageView>(R.id.iv_background)
-                .setImageResource(R.drawable.ic_recharge)
-            "Bills" -> dialog.findViewById<ImageView>(R.id.iv_background)
-                .setImageResource(R.drawable.ic_bill)
-            "Movies" -> dialog.findViewById<ImageView>(R.id.iv_background)
-                .setImageResource(R.drawable.ic_movies)
-            "Online Shopping" -> dialog.findViewById<ImageView>(R.id.iv_background)
-                .setImageResource(R.drawable.ic_shopping)
+            "General" -> imgBack.setImageResource(R.drawable.ic_rupees)
+            "Food" -> imgBack.setImageResource(R.drawable.ic_food)
+            "Fuel" -> imgBack.setImageResource(R.drawable.ic_fuel)
+            "Recharge" -> imgBack.setImageResource(R.drawable.ic_recharge)
+            "Bills" -> imgBack.setImageResource(R.drawable.ic_bill)
+            "Movies" -> imgBack.setImageResource(R.drawable.ic_movies)
+            "Online Shopping" -> imgBack.setImageResource(R.drawable.ic_shopping)
         }
+        imgBack.startAnimation(AnimationUtils.loadAnimation(this, R.anim.rotate_left))
         dialog.show()
     }
 
@@ -264,24 +261,28 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
             minValue = 0
             maxValue = items.size - 1
             displayedValues = items
-            value = month
+            value = mMonth
         }
 
         val yearPicker = dialog.findViewById<NumberPicker>(R.id.picker_year)
         yearPicker.apply {
             minValue = 1900
             maxValue = 2900
-            value = year
+            value = mYear
         }
 
         monthPicker.setOnValueChangedListener { picker, _, _ ->
-            month = picker.value
+            mMonth = picker.value
+            binding?.tvMonth?.text = picker.displayedValues[mMonth].toString()
         }
 
         yearPicker.setOnValueChangedListener { picker, _, _ ->
-            year = picker.value
+            mYear = picker.value
         }
 
+        dialog.setOnCancelListener {
+            getSpendItemCount()
+        }
         dialog.show()
     }
 

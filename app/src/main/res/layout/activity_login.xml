@@ -11,12 +11,11 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/_200sdp"
         android:layout_marginTop="@dimen/_50sdp"
-        android:padding="40dp"
-        android:src="@drawable/ic_rupee"
+        android:padding="@dimen/_20sdp"
+        android:src="@drawable/logo_coloured"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/black" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/sign_in_button"
