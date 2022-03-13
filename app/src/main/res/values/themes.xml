@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.SpendLog" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.SpendLog.Light" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
@@ -15,12 +15,29 @@
 
     </style>
 
-    <style name="ImageCroper" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="Theme.SpendLog.Dark" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/dark_mode_blue</item>
+        <item name="colorPrimaryVariant">@color/dark_mode_blue</item>
+        <item name="colorOnPrimary">@color/dark_mode_blue</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@color/dark_mode_blue</item>
         <!-- Customize your theme here. -->
+<!--
+        <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>
+-->
+
+    </style>
+<!--    <style name="ImageCroper" parent="Theme.AppCompat.Light.DarkActionBar">
+        &lt;!&ndash; Customize your theme here. &ndash;&gt;
         <item name="colorPrimary">@color/green</item>
         <item name="colorPrimaryDark">@color/green</item>
         <item name="colorAccent">@color/green</item>
-    </style>
+    </style>-->
 
     <style name="roundedImageView" parent="">
         <item name="cornerFamily">rounded</item>

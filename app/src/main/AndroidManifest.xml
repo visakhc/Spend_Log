@@ -10,7 +10,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/icon_coloured_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SpendLog">
+        android:theme="@style/Theme.SpendLog.Light">
         <activity
             android:name=".testing"
             android:exported="true">

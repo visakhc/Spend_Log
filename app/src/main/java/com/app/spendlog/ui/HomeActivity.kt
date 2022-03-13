@@ -23,6 +23,8 @@ import com.app.spendlog.utils.SavedSession
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.database.*
+import com.mahfa.dnswitch.DayNightSwitch
+import com.mahfa.dnswitch.DayNightSwitchListener
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -62,10 +64,15 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     }
 
     private fun init() {
+        setTheme()
         setBudget()
         getSpendItemCount()
         setNameImg()
         handleEvents()
+    }
+
+    private fun setTheme() {
+
     }
 
     private fun setBalance() {
@@ -189,6 +196,19 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     }
 
     private fun handleEvents() {
+        binding?.inclLayout?.dayNightSwitch?.setListener { is_night ->
+            SavedSession(this).putSharedBoolean("dark",is_night)
+            if (is_night) {
+                Toast.makeText(this, "night", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "day", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
+        //  day_night_switch.setDuration(450)
+
+
         binding?.swipeHomeLayout?.setOnRefreshListener {
             recreate()
         }
