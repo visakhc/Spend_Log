@@ -29,6 +29,14 @@
         <item name="cornerSizeTopRight">@dimen/_20sdp</item>
     </style>
 
+    <style name="allroundedImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">@dimen/_20sdp</item>
+        <item name="cornerSizeBottomLeft">@dimen/_20sdp</item>
+        <item name="cornerSizeTopRight">@dimen/_20sdp</item>
+        <item name="cornerSizeBottomRight">@dimen/_20sdp</item>
+    </style>
+
     <style name="customFAB" parent="">
         <item name="fabSize">@dimen/_100sdp</item>
         <item name="cornerFamily">rounded</item>
