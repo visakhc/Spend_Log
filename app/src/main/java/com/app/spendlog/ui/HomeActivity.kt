@@ -11,6 +11,7 @@ import android.view.Window
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.app.spendlog.R
 import com.app.spendlog.adapter.SpendAdapter
@@ -23,22 +24,16 @@ import com.app.spendlog.utils.SavedSession
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.database.*
-import com.mahfa.dnswitch.DayNightSwitch
-import com.mahfa.dnswitch.DayNightSwitchListener
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     var mBudget = 0f
-
-    //    private var lastID = -1
     private var modelList = mutableListOf<SpendModel>()
     private val firebaseDatabase = FirebaseDatabase.getInstance()
     private lateinit var rootKey: DatabaseReference
-
     private val today = Calendar.getInstance()
-
     private var mYear = today.get(Calendar.YEAR)
     private var mMonth = today.get(Calendar.MONTH)
     //  val day = today.get(Calendar.DAY_OF_MONTH)
@@ -48,7 +43,6 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding?.root)
-
         val userId = SavedSession(this).getSharedString("userId")
         rootKey = firebaseDatabase.getReference(userId)
         binding?.spendRecycler?.apply {
@@ -56,7 +50,6 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
             layoutManager = LinearLayoutManager(this@HomeActivity)
         }
         //todo fix setrefreshlayout
-        binding?.swipeHomeLayout?.setDistanceToTriggerSync(800)
         val dateFormat = SimpleDateFormat("MMMM", Locale.ENGLISH)
         val currentMonth = dateFormat.format(Date()).uppercase(Locale.ENGLISH)
         binding?.tvMonth?.text = currentMonth
@@ -64,15 +57,10 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     }
 
     private fun init() {
-        setTheme()
         setBudget()
         getSpendItemCount()
         setNameImg()
         handleEvents()
-    }
-
-    private fun setTheme() {
-
     }
 
     private fun setBalance() {
@@ -92,13 +80,12 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
 
     private fun setNameImg() {
         val userPicture = SavedSession(this).getSharedString("userPic")
-
         if (userPicture.length > 5) {
             Glide.with(this)
                 .load(userPicture)
                 .into(binding?.inclLayout?.ivBack!!)
         } else {
-            binding?.inclLayout?.ivBack?.setImageResource(R.drawable.ic_person)
+            binding?.inclLayout?.ivBack?.visibility = View.INVISIBLE
         }
     }
 
@@ -125,7 +112,6 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
 
     private fun getSpendItemCount() {
         var lastID = -1
-        LogUtil("dpend $mYear --- $mMonth")
         rootKey.child("spend").child(mYear.toString()).child(mMonth.toString())
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -189,46 +175,32 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
 
     }
 
-    //TOdo add functionality to delete a spend and make some of these functions to a constructor
-    fun setRecycler(model: MutableList<SpendModel>) {
-        binding?.spendRecycler?.adapter = SpendAdapter(model, this@HomeActivity)
-        binding?.spendRecycler?.adapter?.notifyItemRangeChanged(0, model.size)
-    }
-
     private fun handleEvents() {
         binding?.inclLayout?.dayNightSwitch?.setListener { is_night ->
-            SavedSession(this).putSharedBoolean("dark",is_night)
+            SavedSession(this).putSharedBoolean("dark", is_night)
             if (is_night) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                 Toast.makeText(this, "night", Toast.LENGTH_SHORT).show()
             } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                 Toast.makeText(this, "day", Toast.LENGTH_SHORT).show()
             }
-        }
-
-
-        //  day_night_switch.setDuration(450)
-
-
-        binding?.swipeHomeLayout?.setOnRefreshListener {
-            recreate()
         }
         binding?.inclLayout?.ivSettings?.setOnClickListener {
             SettingsBottomSheet().show(supportFragmentManager, "Settings")
         }
         binding?.inclLayout?.ivBack?.setOnClickListener {
-            val userName = SavedSession(this).getSharedString("userName")
-            Toast.makeText(this, "Coming Soon....$userName", Toast.LENGTH_SHORT).show()
+            val userPicture = SavedSession(this).getSharedString("userPic")
+            showProfilePic(userPicture)
         }
         binding?.tvMonth?.setOnClickListener {
             showDatePickerDialog()
         }
-
         binding?.cvBudget?.setOnClickListener {
             showBudgetDialog()
         }
-
         binding?.tvAddSpend?.setOnClickListener {
-            if (binding?.tvBudgetView?.text == "0") {
+            if (binding?.tvBudgetView?.text == "0" || binding?.tvBudgetView?.text == "0.0") {
                 Snackbar.make(this, it, "Add your Monthly Budget First !!", Snackbar.LENGTH_SHORT)
                     .show()
             } else {
@@ -237,8 +209,22 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
         }
     }
 
-    override fun onEachClick(position: Int) {
-        showRecyclerItemPopup(position)
+    private fun showProfilePic(picUrl: String) {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.setContentView(R.layout.dialog_image_view)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val imgView = dialog.findViewById<ImageView>(R.id.profilePic)
+        if (picUrl.length > 5) {
+            Glide.with(this)
+                .load(picUrl)
+                .into(imgView)
+        } else {
+            imgView.setImageResource(R.drawable.ic_imageview_placeholder)
+        }
+        dialog.show()
     }
 
     private fun showRecyclerItemPopup(pos: Int) {
@@ -331,5 +317,15 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
             }
         }
         dialog.show()
+    }
+
+    //TOdo add functionality to delete a spend and make some of these functions to a constructor
+    fun setRecycler(model: MutableList<SpendModel>) {
+        binding?.spendRecycler?.adapter = SpendAdapter(model, this@HomeActivity)
+        binding?.spendRecycler?.adapter?.notifyItemRangeChanged(0, model.size)
+    }
+
+    override fun onEachClick(position: Int) {
+        showRecyclerItemPopup(position)
     }
 }

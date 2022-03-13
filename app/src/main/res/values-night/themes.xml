@@ -1,27 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Theme.SpendLog.Light" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimary">@color/red</item>
+        <item name="colorPrimaryVariant">@color/red</item>
+        <item name="colorOnPrimary">@color/red</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="colorOnSecondary">@color/red</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">@color/white</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/dark_mode_blue</item>
         <!-- Customize your theme here. -->
-        <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>
+        <!--
+                <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>
+        -->
 
     </style>
-
-    <!--    <style name="ImageCroper" parent="Theme.AppCompat.Light.DarkActionBar">
-            &lt;!&ndash; Customize your theme here. &ndash;&gt;
-            <item name="colorPrimary">@color/green</item>
-            <item name="colorPrimaryDark">@color/green</item>
-            <item name="colorAccent">@color/green</item>
-        </style>-->
 
     <style name="roundedImageView" parent="">
         <item name="cornerFamily">rounded</item>
@@ -64,11 +60,9 @@
         <item name="cornerSizeTopLeft">0dp</item>
 
     </style>
-
     <style name="viewRound">
         <item name="android:radius">@dimen/_10sdp</item>
     </style>
-
     <style name="CardStyle">
         <item name="cardElevation">4dp</item>
         <item name="cardCornerRadius">@dimen/_15sdp</item>
@@ -111,13 +105,11 @@
         <item name="android:fontFamily">@font/poppins_medium</item>
         <item name="android:textColor">@color/black</item>
     </style>
-
     <style name="extraLargeTextRegular">
         <item name="android:textSize">@dimen/_22ssp</item>
         <item name="android:fontFamily">@font/poppins_regular</item>
         <item name="android:textColor">@color/black</item>
     </style>
-
     <style name="extraLargeTextSemiBold">
         <item name="android:textSize">@dimen/_22ssp</item>
         <item name="android:fontFamily">@font/poppins_semibold</item>
@@ -135,13 +127,11 @@
         <item name="android:fontFamily">@font/poppins_medium</item>
         <item name="android:textColor">@color/black</item>
     </style>
-
     <style name="largeTextRegular">
         <item name="android:textSize">@dimen/_16ssp</item>
         <item name="android:fontFamily">@font/poppins_regular</item>
         <item name="android:textColor">@color/black</item>
     </style>
-
     <style name="largeTextSemiBold">
         <item name="android:textSize">@dimen/_16ssp</item>
         <item name="android:fontFamily">@font/poppins_semibold</item>
@@ -160,13 +150,11 @@
         <item name="android:fontFamily">@font/poppins_medium</item>
         <item name="android:textColor">@color/black</item>
     </style>
-
     <style name="mediumTextRegular">
         <item name="android:textSize">@dimen/_14ssp</item>
         <item name="android:fontFamily">@font/poppins_regular</item>
         <item name="android:textColor">@color/black</item>
     </style>
-
     <style name="mediumTextSemiBold">
         <item name="android:textSize">@dimen/_14ssp</item>
         <item name="android:fontFamily">@font/poppins_semibold</item>
@@ -185,13 +173,11 @@
         <item name="android:fontFamily">@font/poppins_medium</item>
         <item name="android:textColor">@color/black</item>
     </style>
-
     <style name="normalTextRegular">
         <item name="android:textSize">@dimen/_12ssp</item>
         <item name="android:fontFamily">@font/poppins_regular</item>
         <item name="android:textColor">@color/black</item>
     </style>
-
     <style name="normalTextSemiBold">
         <item name="android:textSize">@dimen/_12ssp</item>
         <item name="android:fontFamily">@font/poppins_semibold</item>
@@ -209,13 +195,11 @@
         <item name="android:fontFamily">@font/poppins_medium</item>
         <item name="android:textColor">@color/black</item>
     </style>
-
     <style name="smallTextRegular">
         <item name="android:textSize">@dimen/_10ssp</item>
         <item name="android:fontFamily">@font/poppins_regular</item>
         <item name="android:textColor">@color/black</item>
     </style>
-
     <style name="smallTextSemiBold">
         <item name="android:textSize">@dimen/_10ssp</item>
         <item name="android:fontFamily">@font/poppins_semibold</item>
@@ -234,13 +218,11 @@
         <item name="android:fontFamily">@font/poppins_medium</item>
         <item name="android:textColor">@color/black</item>
     </style>
-
     <style name="verySmallTextRegular">
         <item name="android:textSize">@dimen/_8ssp</item>
         <item name="android:fontFamily">@font/poppins_regular</item>
         <item name="android:textColor">@color/black</item>
     </style>
-
     <style name="verySmallTextSemiBold">
         <item name="android:textSize">@dimen/_8ssp</item>
         <item name="android:fontFamily">@font/poppins_semibold</item>

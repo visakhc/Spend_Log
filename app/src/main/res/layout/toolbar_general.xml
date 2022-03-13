@@ -46,6 +46,7 @@
     <com.mahfa.dnswitch.DayNightSwitch
         android:id="@+id/day_night_switch"
         android:layout_width="35dp"
+        android:visibility="invisible"
         android:layout_height="20dp"
         android:layout_gravity="center"
         android:layout_marginEnd="@dimen/_10sdp"

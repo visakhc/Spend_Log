@@ -14,13 +14,6 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        val vv = SavedSession(this).getSharedBoolean("dark",false)
-        if(vv){
-            Toast.makeText(this, "night", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "day", Toast.LENGTH_SHORT).show()
-        }
-
         val userId = SavedSession(this).getSharedString("userId")
         if (userId.isEmpty() || userId == "notfound" || userId.isBlank()) {
             val intent = Intent(this, LoginActivity::class.java)
