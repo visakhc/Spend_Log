@@ -6,6 +6,8 @@ data class SpendModel(
     val month: String? = null,
     val year: String? = null,
     val time: String? = null,
+    val snapimageid: String? = null,
+    val description: String? = null,
     val day: String? = null,
     val spendType: String? = null
 )

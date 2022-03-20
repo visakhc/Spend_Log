@@ -32,7 +32,7 @@ class SpendAdapter(
         var amount: TextView = itemView.findViewById(R.id.tv_amount_spend)
         var date: TextView = itemView.findViewById(R.id.tv_date)
         var time: TextView = itemView.findViewById(R.id.tv_time)
-        override fun onClick(v: View) {
+         override fun onClick(v: View) {
             OnEachListener.onEachClick(adapterPosition)
         }
 

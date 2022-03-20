@@ -4,10 +4,11 @@ import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
@@ -18,17 +19,19 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.core.net.toFile
 import com.app.spendlog.R
 import com.app.spendlog.databinding.BottomsheetAddSpendBinding
 import com.app.spendlog.utils.LogUtil
 import com.app.spendlog.utils.SavedSession
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.ktx.component1
+import com.google.firebase.storage.ktx.component2
 import com.google.firebase.storage.ktx.storage
 import java.io.ByteArrayOutputStream
 import java.text.DateFormatSymbols
@@ -69,7 +72,7 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
 
         val userId = SavedSession(requireContext()).getSharedString("userId")
         rootKey = firebaseDatabase.getReference(userId)
-        imagesRef = storageRef.child(userId)
+        imagesRef = storageRef.child("users").child(userId)
 
 
         init()
@@ -114,6 +117,7 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun handleEvents() {
+
         binding?.snappedImg?.setOnClickListener {
             showProfilePic(binding?.snappedImg?.drawable)
         }
@@ -130,8 +134,10 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
             val spendType = binding?.tlType?.editText?.text.toString()
             val amount = binding?.etAmount?.text.toString()
             var description = binding?.etDesc?.text.toString()
-            var img = binding?.snappedImg
-            var downloadUri = "null"
+            val timestamp = System.currentTimeMillis().toString()
+            val img = binding?.snappedImg
+            val matrix = ColorMatrix()
+
             if (spendType.isEmpty() || amount.isEmpty() || mDate.isEmpty() || mTime.isEmpty()) {
                 Toast.makeText(requireContext(), "Fill All Data", Toast.LENGTH_SHORT).show()
             } else {
@@ -147,34 +153,8 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
                     val baos = ByteArrayOutputStream()
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 40, baos)
                     val data = baos.toByteArray()
-                    val timestamp = System.currentTimeMillis().toString()
-                    val uploadTask =
-                        imagesRef.child(timestamp).putBytes(data)
-                    uploadTask.continueWithTask { task ->
-                        if (!task.isSuccessful) {
-                            task.exception?.let {
-                                throw it
-                            }
-                        }
-                        imagesRef.child(timestamp).downloadUrl
-                    }.addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            downloadUri = task.result.toString()
-                            LogUtil(downloadUri)
-                        } else {
-                            Toast.makeText(
-                                requireContext(),
-                                "Failed Please try again",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                    uploadTask.addOnFailureListener {
-                        LogUtil(it.message.toString())
-                    }.addOnSuccessListener { taskSnapshot ->
-                        Toast.makeText(requireContext(), "Added", Toast.LENGTH_SHORT).show()
-                        LogUtil(taskSnapshot.metadata.toString())
-                    }
+                    val uploadTask = imagesRef.child(timestamp).putBytes(data)
+
 //here todo
                     rootKey.child("spend")
                         .child(mYear)
@@ -183,7 +163,7 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
                             child("spendType").setValue(spendType)
                             child("amount").setValue(amount)
                             child("description").setValue(description)
-                            child("snapid").setValue(downloadUri)
+                            child("snapimageid").setValue(timestamp)
                             child("date").setValue(mDate)
                             child("time").setValue(mTime)
                             child("day").setValue(mDay)
@@ -198,10 +178,30 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
                                         rootKey.child("totalspend").setValue(amount)
                                     }
                                 }
-                                dialog?.dismiss()
 
                             }
                         }
+
+                    uploadTask.addOnProgressListener { (bytesTransferred, totalByteCount) ->
+                        val progress = (100 * bytesTransferred) / totalByteCount
+                        binding?.tvPgrss?.setTextColor(Color.BLACK)
+                        binding?.tvPgrss?.text = "$progress%"
+//                        matrix.setSaturation(0f)
+//                        img.setColorFilter(ColorMatrixColorFilter(matrix))
+
+                    }.addOnPausedListener {
+                        binding?.tvPgrss?.setTextColor(Color.RED)
+                    }
+                    uploadTask.addOnFailureListener {
+                        LogUtil(it.message.toString())
+                        Snackbar.make(requireView(), "Failed to upload image", Snackbar.LENGTH_LONG)
+                            .show()
+                    }.addOnSuccessListener { taskSnapshot ->
+                        Toast.makeText(requireContext(), "spend added", Toast.LENGTH_SHORT)
+                            .show()
+                        dialog?.dismiss()
+                        LogUtil(taskSnapshot.metadata.toString())
+                    }
                 }
 
             }
