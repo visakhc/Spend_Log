@@ -266,8 +266,10 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
         }
         val rotate = AnimationUtils.loadAnimation(this, R.anim.rotate_left)
         imgBg.startAnimation(rotate)
-        if (modelList[pos].description.isNullOrEmpty()) {
+
+        if (modelList[pos].description.isNullOrEmpty() || modelList[pos].description.toString() == "null") {
             dialog.findViewById<TextView>(R.id.tv_description).visibility = View.GONE
+            dialog.findViewById<TextView>(R.id.tv_Desc).visibility = View.GONE
         } else {
             dialog.findViewById<TextView>(R.id.tv_description).text = modelList[pos].description
         }
@@ -294,7 +296,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
                     p3: DataSource?,
                     p4: Boolean
                 ): Boolean {
-                    dialog.findViewById<ImageView>(R.id.snap_img).visibility=View.VISIBLE
+                    dialog.findViewById<ImageView>(R.id.snap_img).visibility = View.VISIBLE
                     return false
                 }
             })
