@@ -20,6 +20,7 @@ import com.app.spendlog.bottomsheets.AddSpendBottomSheet
 import com.app.spendlog.bottomsheets.SettingsBottomSheet
 import com.app.spendlog.databinding.ActivityHomeBinding
 import com.app.spendlog.model.SpendModel
+import com.app.spendlog.utils.LogUtil
 import com.app.spendlog.utils.SavedSession
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -44,6 +45,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     private val today = Calendar.getInstance()
     private var mYear = today.get(Calendar.YEAR)
     private var mMonth = today.get(Calendar.MONTH)
+    private var userId = ""
 
     //  val day = today.get(Calendar.DAY_OF_MONTH)
     private val storage = Firebase.storage
@@ -54,7 +56,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding?.root)
-        val userId = SavedSession(this).getSharedString("userId")
+        userId = SavedSession(this).getSharedString("userId")
         rootKey = firebaseDatabase.getReference(userId)
         binding?.spendRecycler?.apply {
             setHasFixedSize(true)
@@ -239,11 +241,8 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     }
 
     private fun showRecyclerItemPopup(pos: Int) {
-        //val userId = SavedSession(this).getSharedString("userId")
-
-     /*   val imagesRef: StorageReference =
+        val imagesRef =
             storageRef.child("users").child(userId).child((modelList[pos].snapimageid).toString())
-*/
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(true)
@@ -264,40 +263,44 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
             "Bills" -> imgBg.setImageResource(R.drawable.ic_bill)
             "Movies" -> imgBg.setImageResource(R.drawable.ic_movies)
             "Online Shopping" -> imgBg.setImageResource(R.drawable.ic_shopping)
-        }/*
+        }
+        val rotate = AnimationUtils.loadAnimation(this, R.anim.rotate_left)
+        imgBg.startAnimation(rotate)
         if (modelList[pos].description.isNullOrEmpty()) {
             dialog.findViewById<TextView>(R.id.tv_description).visibility = View.GONE
         } else {
             dialog.findViewById<TextView>(R.id.tv_description).text = modelList[pos].description
         }
 
-        Glide.with(this)
+
+        Glide.with(this@HomeActivity)
             .load(imagesRef)
-            .placeholder(R.drawable.ic_imageview_placeholder)
-            .listener(object : RequestListener<Drawable?> {
+            // .placeholder(R.drawable.ic_imageview_placeholder)
+            .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any?,
-                    target: Target<Drawable?>?,
-                    isFirstResource: Boolean
+                    p0: GlideException?,
+                    p1: Any?,
+                    p2: Target<Drawable>?,
+                    p3: Boolean
                 ): Boolean {
-                    dialog.findViewById<ImageView>(R.id.snap_img).visibility = View.GONE
+                    LogUtil("LoadFailed")
                     return false
                 }
 
                 override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any?,
-                    target: Target<Drawable?>?,
-                    dataSource: DataSource?,
-                    isFirstResource: Boolean
+                    p0: Drawable?,
+                    p1: Any?,
+                    p2: Target<Drawable>?,
+                    p3: DataSource?,
+                    p4: Boolean
                 ): Boolean {
-                    dialog.findViewById<ImageView>(R.id.snap_img).visibility = View.VISIBLE
-                    return true
+                    dialog.findViewById<ImageView>(R.id.snap_img).visibility=View.VISIBLE
+                    return false
                 }
-
             })
-            .into(dialog.findViewById(R.id.snap_img))*/
+            .into(dialog.findViewById(R.id.snap_img))
+
+        dialog.show()
     }
 
     private fun showDatePickerDialog() {

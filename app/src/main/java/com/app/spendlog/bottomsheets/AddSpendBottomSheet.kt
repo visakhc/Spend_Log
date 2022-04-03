@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -146,15 +145,6 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
                 }
                 rootKey.child("spend").child(mYear).child(mMonth).get().addOnSuccessListener {
                     val spendId = it.childrenCount.toInt()
-
-                    img?.isDrawingCacheEnabled = true
-                    img?.buildDrawingCache()
-                    val bitmap = (img?.drawable as BitmapDrawable).bitmap
-                    val baos = ByteArrayOutputStream()
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 40, baos)
-                    val data = baos.toByteArray()
-                    val uploadTask = imagesRef.child(timestamp).putBytes(data)
-
 //here todo
                     rootKey.child("spend")
                         .child(mYear)
@@ -177,34 +167,52 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
                                     } else {
                                         rootKey.child("totalspend").setValue(amount)
                                     }
+                                    if (img?.drawable != null) {
+                                        uploadImg(img, timestamp)
+                                    } else {
+                                        Toast.makeText(
+                                            requireContext(),
+                                            "spend added",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                            .show()
+                                        dialog?.dismiss()
+                                    }
                                 }
-
                             }
                         }
-
-                    uploadTask.addOnProgressListener { (bytesTransferred, totalByteCount) ->
-                        val progress = (100 * bytesTransferred) / totalByteCount
-                        binding?.tvPgrss?.setTextColor(Color.BLACK)
-                        binding?.tvPgrss?.text = "$progress%"
-//                        matrix.setSaturation(0f)
-//                        img.setColorFilter(ColorMatrixColorFilter(matrix))
-
-                    }.addOnPausedListener {
-                        binding?.tvPgrss?.setTextColor(Color.RED)
-                    }
-                    uploadTask.addOnFailureListener {
-                        LogUtil(it.message.toString())
-                        Snackbar.make(requireView(), "Failed to upload image", Snackbar.LENGTH_LONG)
-                            .show()
-                    }.addOnSuccessListener { taskSnapshot ->
-                        Toast.makeText(requireContext(), "spend added", Toast.LENGTH_SHORT)
-                            .show()
-                        dialog?.dismiss()
-                        LogUtil(taskSnapshot.metadata.toString())
-                    }
                 }
-
             }
+        }
+    }
+
+    private fun uploadImg(img: ImageView?, timestamp: String) {
+        img?.isDrawingCacheEnabled = true
+        img?.buildDrawingCache()
+        val bitmap = (img?.drawable as BitmapDrawable).bitmap
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 40, baos)
+        val data = baos.toByteArray()
+        val uploadTask = imagesRef.child(timestamp).putBytes(data)
+        uploadTask.addOnProgressListener { (bytesTransferred, totalByteCount) ->
+            val progress = (100 * bytesTransferred) / totalByteCount
+            binding?.tvPgrss?.setTextColor(Color.BLACK)
+            binding?.tvPgrss?.text = "$progress%"
+//          matrix.setSaturation(0f)
+//          img.setColorFilter(ColorMatrixColorFilter(matrix))
+
+        }.addOnPausedListener {
+            binding?.tvPgrss?.setTextColor(Color.RED)
+        }
+        uploadTask.addOnFailureListener {
+            LogUtil(it.message.toString())
+            Snackbar.make(requireView(), "Failed to upload image", Snackbar.LENGTH_LONG)
+                .show()
+        }.addOnSuccessListener { taskSnapshot ->
+            Toast.makeText(requireContext(), "spend added", Toast.LENGTH_SHORT)
+                .show()
+            dialog?.dismiss()
+            LogUtil(taskSnapshot.metadata.toString())
         }
     }
 
