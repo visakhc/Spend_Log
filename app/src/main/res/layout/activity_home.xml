@@ -16,7 +16,7 @@
         app:layout_constraintGuide_percent="0.10"
         app:layout_constraintTop_toTopOf="parent" />
 
-  <include
+    <include
         android:id="@+id/incl_layout"
         layout="@layout/toolbar_general"
         app:layout_constraintEnd_toEndOf="parent"
@@ -24,7 +24,8 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cv_budget"
+        android:id="@+id/cv_balance"
+
         android:layout_width="wrap_content"
         android:layout_height="@dimen/_120sdp"
         android:layout_marginHorizontal="@dimen/_10sdp"
@@ -47,14 +48,15 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:layout_marginBottom="@dimen/_15sdp"
-                android:text="Budget"
+                android:text="Balance"
                 android:textColor="@color/black"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/tv_budget_view"
+                android:id="@+id/tv_balance"
+
                 style="@style/extraLargeTextMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -97,8 +99,9 @@
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cv_balance"
+        android:id="@+id/cv_budget"
         android:layout_width="wrap_content"
+
         android:layout_height="@dimen/_30sdp"
         android:outlineSpotShadowColor="@color/red"
         app:cardCornerRadius="15dp"
@@ -118,10 +121,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_20sdp"
-                android:text="Bal. Rs " />
+                android:text="Budget is  " />
 
             <TextView
-                android:id="@+id/tv_balance"
+                android:id="@+id/tv_budget_view"
                 style="@style/normalTextRegular"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

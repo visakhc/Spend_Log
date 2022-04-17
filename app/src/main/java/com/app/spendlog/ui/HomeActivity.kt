@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.InputFilter
 import android.util.Log
 import android.view.View
 import android.view.Window
@@ -33,6 +34,8 @@ import com.google.firebase.database.annotations.Nullable
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -77,18 +80,19 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     }
 
     private fun setBalance() {
-        rootKey.child("totalspend").addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    val totalSpend = dataSnapshot.value.toString()
-                    binding?.tvBalance?.text = (mBudget - totalSpend.toFloat()).toString()
-                } else {
-                    binding?.tvBalance?.text = mBudget.toString()
+        rootKey.child(mYear.toString()).child(mMonth.toString())
+            .child("totalspend").addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        val totalSpend = dataSnapshot.value.toString()
+                        binding?.tvBalance?.text = (mBudget - totalSpend.toFloat()).toString()
+                    } else {
+                        binding?.tvBalance?.text = mBudget.toString()
+                    }
                 }
-            }
 
-            override fun onCancelled(error: DatabaseError) {}
-        })
+                override fun onCancelled(error: DatabaseError) {}
+            })
     }
 
     private fun setNameImg() {
@@ -104,23 +108,25 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
 
     private fun setBudget() {
 
-        rootKey.child("budget").addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                Log.d("GAuthResp", dataSnapshot.value.toString())
-                if (dataSnapshot.exists()) {
-                    val post = dataSnapshot.value.toString()
-                    mBudget = post.toFloat()
-                    binding?.tvBudgetView?.text = post.toString()
-                    setBalance()
-                } else {
-                    showBudgetDialog()
+        rootKey.child(mYear.toString()).child(mMonth.toString())
+            .child("budget").addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    Log.d("GAuthResp", dataSnapshot.value.toString())
+                    if (dataSnapshot.exists()) {
+                        val post = dataSnapshot.value.toString()
+                        mBudget = post.toFloat()
+                        binding?.tvBudgetView?.text = post.toString()
+                        setBalance()
+                    } else {
+                        mBudget = 0f
+                        showBudgetDialog()
+                    }
                 }
-            }
 
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.w("GAuthResp", "loadPost:onCancelled", databaseError.toException())
-            }
-        })
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.w("GAuthResp", "loadPost:onCancelled", databaseError.toException())
+                }
+            })
     }
 
     private fun getSpendItemCount() {
@@ -138,6 +144,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
                         getSpendData(spendCount)
                     } else {
                         modelList.clear()
+                        setBudget()
                         binding?.spendRecycler?.adapter?.notifyDataSetChanged()
                         if (binding?.lottieView?.visibility == View.GONE) {
                             binding?.lottieView?.visibility = View.VISIBLE
@@ -314,20 +321,22 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
         dialog.setContentView(R.layout.dialog_date_selector)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
+
+        val yearPicker = dialog.findViewById<NumberPicker>(R.id.picker_year)
+        yearPicker.apply {
+            minValue = 2000
+            maxValue = mYear
+            value = mYear
+        }
+
         val monthPicker = dialog.findViewById<NumberPicker>(R.id.picker_month)
         monthPicker.apply {
             minValue = 0
-            maxValue = items.size - 1
+            maxValue = items.lastIndex
             displayedValues = items
             value = mMonth
         }
 
-        val yearPicker = dialog.findViewById<NumberPicker>(R.id.picker_year)
-        yearPicker.apply {
-            minValue = 1900
-            maxValue = 2900
-            value = mYear
-        }
 
         monthPicker.setOnValueChangedListener { picker, _, _ ->
             mMonth = picker.value
@@ -347,22 +356,25 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     private fun showBudgetDialog() {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(true)
+        dialog.setCancelable(false)
+        dialog.setCanceledOnTouchOutside(false)
         dialog.setContentView(R.layout.dialog_set_budget)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.findViewById<EditText>(R.id.et_add_amount).setText(mBudget.toString())
+        dialog.findViewById<EditText>(R.id.et_add_amount).setText(mBudget.toInt().toString())
         dialog.findViewById<ImageView>(R.id.submit_budget).setOnClickListener {
-            val amt = dialog.findViewById<EditText>(R.id.et_add_amount).text.toString()
-            if (amt.isNullOrEmpty()) {
+            val budget = dialog.findViewById<EditText>(R.id.et_add_amount).text.toString()
+            //  val budget = String.format("%.2f", amt)
+            if (budget.isEmpty()) {
                 dialog.dismiss()
             } else {
-                if (amt.isNotEmpty()) {
-                    rootKey.child("budget").setValue(amt).addOnSuccessListener {
-                        dialog.dismiss()
-                        setBudget()
-                        setBalance()
-                    }
+                if (budget.isNotEmpty()) {
+                    rootKey.child(mYear.toString()).child(mMonth.toString())
+                        .child("budget").setValue(budget).addOnSuccessListener {
+                            setBudget()
+                            //  setBalance()
+                            dialog.dismiss()
+
+                        }
                 } else {
                     Log.d("ERROR", "HomeActivity line 241")
                 }

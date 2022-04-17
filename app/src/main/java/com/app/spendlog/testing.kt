@@ -47,14 +47,5 @@ class testing : AppCompatActivity() {
         binding = ActivityTestingBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
-        val imagesRef = storageRef.child("users").child("9561fff1e8045452847baa175f459c0a")
-            .child("1648994625889")
-        val img = binding?.snappedImg
-
-        Glide.with(this@testing)
-            .load(imagesRef)
-            .placeholder(R.drawable.ic_imageview_placeholder)
-            .into(img!!)
-
     }
 }

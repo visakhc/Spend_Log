@@ -159,13 +159,16 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
                             child("day").setValue(mDay)
                             child("month").setValue(mMonth)
                             child("year").setValue(mYear).addOnSuccessListener {
-                                rootKey.child("totalspend").get().addOnSuccessListener {
+                                rootKey.child(mYear.toString()).child(mMonth.toString())
+                                    .child("totalspend").get().addOnSuccessListener {
                                     if (it.exists()) {
                                         val lastTotal = it.value.toString()
-                                        rootKey.child("totalspend")
+                                        rootKey.child(mYear.toString()).child(mMonth.toString())
+                                            .child("totalspend")
                                             .setValue(lastTotal.toFloat() + amount.toFloat())
                                     } else {
-                                        rootKey.child("totalspend").setValue(amount)
+                                        rootKey.child(mYear.toString()).child(mMonth.toString())
+                                            .child("totalspend").setValue(amount)
                                     }
                                     if (img?.drawable != null) {
                                         uploadImg(img, timestamp)
