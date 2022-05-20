@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.text.InputFilter
 import android.util.Log
 import android.view.View
 import android.view.Window
@@ -23,6 +22,8 @@ import com.app.spendlog.databinding.ActivityHomeBinding
 import com.app.spendlog.model.SpendModel
 import com.app.spendlog.utils.LogUtil
 import com.app.spendlog.utils.SavedSession
+import com.app.spendlog.utils.firebaseDatabase
+import com.app.spendlog.utils.storageRef
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -30,7 +31,6 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.database.*
-import com.google.firebase.database.annotations.Nullable
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
@@ -43,24 +43,24 @@ import java.util.*
 class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener {
     var mBudget = 0f
     private var modelList = mutableListOf<SpendModel>()
-    private val firebaseDatabase = FirebaseDatabase.getInstance()
     private lateinit var rootKey: DatabaseReference
     private val today = Calendar.getInstance()
     private var mYear = today.get(Calendar.YEAR)
     private var mMonth = today.get(Calendar.MONTH)
     private var userId = ""
 
-    //  val day = today.get(Calendar.DAY_OF_MONTH)
-    private val storage = Firebase.storage
-    private val storageRef = storage.reference
+    // val day = today.get(Calendar.DAY_OF_MONTH)
+
 
     private var binding: ActivityHomeBinding? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding?.root)
+
         userId = SavedSession(this).getSharedString("userId")
         rootKey = firebaseDatabase.getReference(userId)
+
         binding?.spendRecycler?.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(this@HomeActivity)
