@@ -25,7 +25,6 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cv_balance"
-
         android:layout_width="wrap_content"
         android:layout_height="@dimen/_120sdp"
         android:layout_marginHorizontal="@dimen/_10sdp"
@@ -33,9 +32,11 @@
         android:visibility="visible"
         app:cardCornerRadius="30dp"
         app:cardElevation="15dp"
+        app:layout_constraintBottom_toTopOf="@+id/cv_budget"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/guideline2">
+        app:layout_constraintTop_toBottomOf="@+id/guideline2"
+        app:layout_constraintVertical_bias="0">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
@@ -121,10 +122,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_20sdp"
-                android:text="Budget is  " />
+                android:text="Spend  " />
 
             <TextView
-                android:id="@+id/tv_budget_view"
+                android:id="@+id/tv_spend_view"
                 style="@style/normalTextRegular"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -133,6 +134,31 @@
         </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="@id/cv_budget"
+        app:layout_constraintStart_toStartOf="@id/cv_budget"
+        app:layout_constraintTop_toBottomOf="@+id/cv_budget">
+
+        <TextView
+            style="@style/verySmallTextRegular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your Budget for this month is  "
+            android:textStyle="italic" />
+
+        <TextView
+            android:id="@+id/tv_budget_view"
+            style="@style/normalTextRegular"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="------" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tv_month"
