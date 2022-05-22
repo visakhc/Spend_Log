@@ -30,15 +30,25 @@
         app:layout_constraintTop_toBottomOf="@+id/view" />
 
     <TextView
+        android:id="@+id/tvAddBudget"
+        style="@style/mediumTextRegular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:text="set Budget"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_settings" />
+    <TextView
         android:id="@+id/tv_logout"
         style="@style/mediumTextRegular"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_50sdp"
+        android:layout_marginTop="@dimen/_8sdp"
         android:text="Logout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_settings" />
+        app:layout_constraintTop_toBottomOf="@+id/tvAddBudget" />
 
     <TextView
         android:id="@+id/tv_thanks"

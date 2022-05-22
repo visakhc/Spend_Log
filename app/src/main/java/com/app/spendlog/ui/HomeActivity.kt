@@ -2,30 +2,36 @@ package com.app.spendlog.ui
 
 import android.app.Dialog
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.InputFilter
 import android.util.Log
 import android.view.View
 import android.view.Window
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.app.spendlog.MoneyValueFilter
 import com.app.spendlog.R
 import com.app.spendlog.adapter.SpendAdapter
 import com.app.spendlog.bottomsheets.AddSpendBottomSheet
 import com.app.spendlog.bottomsheets.SettingsBottomSheet
 import com.app.spendlog.databinding.ActivityHomeBinding
-import com.app.spendlog.firebase.Child.BUDGET
-import com.app.spendlog.firebase.Child.SPEND
-import com.app.spendlog.firebase.Child.SPENDCOUNT
-import com.app.spendlog.firebase.Child.TOTALSPEND
+import com.app.spendlog.firebase.Childs.BUDGET
+import com.app.spendlog.firebase.Childs.SPEND
+import com.app.spendlog.firebase.Childs.SPENDCOUNT
+import com.app.spendlog.firebase.Childs.TOTALSPEND
+import com.app.spendlog.firebase.ApiCallback
+import com.app.spendlog.firebase.Childs.LEDGER
 import com.app.spendlog.firebase.Constant
 import com.app.spendlog.firebase.Constant.storageRef
+import com.app.spendlog.firebase.FirebaseCallbacks
 import com.app.spendlog.model.SpendModel
+import com.app.spendlog.ui.HomeActivity.Companion.totalSpend
 import com.app.spendlog.utils.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -41,14 +47,18 @@ import java.util.*
 class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener, FirebaseCallbacks {
     private lateinit var rootKey: DatabaseReference
     var mBudget: Double = 0.0
-    var lastID = -1
-
     private var modelList = mutableListOf<SpendModel>()
+    private var snapshotList = mutableListOf<DatabaseReference>()
     private val today = Calendar.getInstance()
     private var mYear = today.get(Calendar.YEAR)
     private var mMonth = today.get(Calendar.MONTH)
     private var userId = ""
-    private var commonUtil: CommonUtil? = null
+    private var commonUtil: ApiCallback? = null
+
+    companion object {
+        var totalSpend: Double = 0.0
+
+    }
 
     // val day = today.get(Calendar.DAY_OF_MONTH)
     private var binding: ActivityHomeBinding? = null
@@ -56,7 +66,8 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener, FirebaseC
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding?.root)
-        commonUtil = CommonUtil(this@HomeActivity, this)
+
+        commonUtil = ApiCallback(this@HomeActivity, this)
         userId = SavedSession(this).getSharedString("userId")
         rootKey = Constant.firebaseDatabase.getReference(userId)
 
@@ -71,9 +82,9 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener, FirebaseC
         init()
     }
 
-    private fun init() = commonUtil?.apply {
-        getBudget(mYear, mMonth)
-        getSpendItemCount(lastID, mYear, mMonth)
+    private fun init() {
+        //  getSpendItemCount(lastID, mYear, mMonth)
+        commonUtil?.getSpendData(mYear, mMonth)
         setNameImg()
         handleEvents()
     }
@@ -91,37 +102,6 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener, FirebaseC
     }
 
 
-    private fun getSpendData(spendCount: Int) {
-        modelList.clear()
-        rootKey.child(SPEND)
-            .child(mYear.toString())
-            .child(mMonth.toString())
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        for (spends in dataSnapshot.children) {
-                            val user = spends.getValue(SpendModel::class.java)
-                            user?.let { modelList.asReversed().add(it) }
-                            if (binding?.lottieView?.visibility == View.VISIBLE) {
-                                binding?.lottieView?.visibility = View.GONE
-                                binding?.tvMessage?.visibility = View.GONE
-                            }
-                            if (modelList.size == spendCount) {
-                                setRecycler(modelList)
-                            }
-                        }
-
-                    } else {
-                        Log.w("ERROR", "Error near line 136 HomeActivity")
-                    }
-                }
-
-                override fun onCancelled(databaseError: DatabaseError) {
-                    Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-                }
-            })
-    }
-
     private fun handleEvents() {
 
         binding?.inclLayout?.ivSettings?.setOnClickListener {
@@ -138,7 +118,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener, FirebaseC
             showBudgetDialog()
         }
         binding?.tvAddSpend?.setOnClickListener {
-            if (binding?.tvBudgetView?.text == "0" || binding?.tvBudgetView?.text == "0.0") {
+            if (mBudget <= 0) {
                 Snackbar.make(this, it, "Add your Monthly Budget First !!", Snackbar.LENGTH_SHORT)
                     .show()
             } else {
@@ -210,7 +190,7 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener, FirebaseC
                     p2: Target<Drawable>?,
                     p3: Boolean
                 ): Boolean {
-                    LogUtil("LoadFailed")
+                    logThis("LoadFailed")
                     return false
                 }
 
@@ -265,35 +245,35 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener, FirebaseC
         }
 
         dialog.setOnCancelListener {
-            commonUtil?.getSpendItemCount(lastID, mYear, mMonth)
+            commonUtil?.getSpendData(mYear, mMonth)
         }
         dialog.show()
     }
 
-    private fun showBudgetDialog() {
-        val dialog = Dialog(this)
+    fun showBudgetDialog(context: Context = this) {
+        logThis("thissss")
+        val dialog = Dialog(context)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
         dialog.setCanceledOnTouchOutside(false)
         dialog.setContentView(R.layout.dialog_set_budget)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.findViewById<EditText>(R.id.et_add_amount).setText(mBudget.toInt().toString())
+        dialog.findViewById<EditText>(R.id.et_add_amount).setText(doubleToString(mBudget))
+        val budgetView = dialog.findViewById<EditText>(R.id.et_add_amount)
+        budgetView.filters = arrayOf<InputFilter>(MoneyValueFilter())
         dialog.findViewById<ImageView>(R.id.submit_budget).setOnClickListener {
-            val budget = dialog.findViewById<EditText>(R.id.et_add_amount).text.toString()
-            //  val budget = String.format("%.2f", amt)
+            val budget = budgetView.text.toString()
             if (budget.isEmpty()) {
-                dialog.dismiss()
+                budgetView.error = "this field cannot be empty"
             } else {
-                if (budget.isNotEmpty()) {
-                    rootKey.child(mYear.toString()).child(mMonth.toString())
-                        .child("budget").setValue(budget).addOnSuccessListener {
-                            //    setBudget()
-                            //  setBalance()
-                            dialog.dismiss()
-
-                        }
+                if (budget.toDouble() < 1) {
+                    budgetView.error = "minimum value is 1"
                 } else {
-                    Log.d("ERROR", "HomeActivity line 241")
+                    //mBudget =budget.toDouble()
+                    rootKey.child(LEDGER).child(mYear.toString()).child(mMonth.toString())
+                        .child(BUDGET).setValue(budget.toDouble()).addOnSuccessListener {
+                            dialog.dismiss()
+                        }
                 }
             }
         }
@@ -301,13 +281,17 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener, FirebaseC
     }
 
     //TOdo add functionality to delete a spend and make some of these functions to a constructor
-    fun setRecycler(model: MutableList<SpendModel>) {
+    private fun setRecycler(model: MutableList<SpendModel>) {
         binding?.spendRecycler?.adapter = SpendAdapter(model, this@HomeActivity)
         binding?.spendRecycler?.adapter?.notifyItemRangeChanged(0, model.size)
     }
 
     override fun onEachClick(position: Int) {
         showRecyclerItemPopup(position)
+    }
+
+    override fun onLongPress(position: Int) {
+        snapshotList[position].removeValue()
     }
 
     override fun onSuccess(status: Boolean, result: String, dataSnapshot: DataSnapshot) {
@@ -317,30 +301,49 @@ class HomeActivity : AppCompatActivity(), SpendAdapter.OnEachListener, FirebaseC
                     val post = dataSnapshot.value.toString().toDouble()
                     mBudget = post
                     binding?.tvBudgetView?.text = post.toString()
-                    commonUtil?.getBalance(mYear, mMonth)
+                    commonUtil?.getTotalspend(mYear, mMonth)
                 } else {
-                    mBudget = 0.0
+                    binding?.tvBalance?.text = "0"
+                    binding?.tvSpendView?.text = "0"
                     showBudgetDialog()
                 }
             }
             TOTALSPEND -> {
                 if (status) {
-                    val totalSpend = dataSnapshot.value.toString().toDouble()
-                    binding?.tvBalance?.text = (mBudget - totalSpend).toString()
+                    totalSpend = dataSnapshot.value.toString().toDouble()
+                    binding?.tvSpendView?.text = "Rs.$totalSpend"
+                    val balance = mBudget - totalSpend
+                    binding?.tvBalance?.text = "Rs.${balance}"
                 } else {
+                    totalSpend = 0.0
+                    binding?.tvSpendView?.text = "0"
                     binding?.tvBalance?.text = mBudget.toString()
                 }
             }
-            SPENDCOUNT -> {
+            SPEND -> {
                 if (status) {
-                    val spendCount = dataSnapshot.childrenCount.toInt()
-                    if (binding?.lottieView?.visibility == View.VISIBLE) {
-                        binding?.lottieView?.visibility = View.GONE
-                        binding?.tvMessage?.visibility = View.GONE
+                    modelList.clear()
+                    snapshotList.clear()
+                    commonUtil?.getBudget(mYear, mMonth) // may this will fuck up todo
+                    for (spends in dataSnapshot.children) {
+                        snapshotList.asReversed().add(spends.ref)
+                        logThis("spendRef" + spends.ref.toString())
+                        val user = spends.getValue(SpendModel::class.java)
+                        user?.let {
+                            modelList.asReversed().add(it)
+                        }
+                        if (binding?.lottieView?.visibility == View.VISIBLE) {
+                            binding?.lottieView?.visibility = View.GONE
+                            binding?.tvMessage?.visibility = View.GONE
+                        }
+                        if (modelList.size == dataSnapshot.children.count()) {
+                            setRecycler(modelList)
+                        }
                     }
-                    lastID = spendCount
-                    getSpendData(spendCount)
+
                 } else {
+                    totalSpend = 0.0
+                    mBudget = 0.0
                     modelList.clear()
                     commonUtil?.getBudget(mYear, mMonth)
                     binding?.spendRecycler?.adapter?.notifyDataSetChanged()

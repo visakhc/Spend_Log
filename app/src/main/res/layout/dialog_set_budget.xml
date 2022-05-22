@@ -1,57 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="@dimen/_160sdp"
-        android:layout_height="@dimen/_160sdp"
-        app:cardCornerRadius="32dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    android:layout_width="@dimen/_200sdp"
+    android:layout_height="@dimen/_160sdp"
+    app:cardCornerRadius="32dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textIPlayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            app:boxBackgroundMode="filled"
+            app:hintEnabled="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/guideline4">
 
-
-            <EditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_add_amount"
-                android:inputType="numberDecimal"
                 style="@style/normalTextRegular"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/_15sdp"
                 android:drawableEnd="@drawable/ic_rupee"
                 android:gravity="center"
-                android:hint="type your budget"
-                android:maxLines="1"
+                android:hint=" your budget"
+                android:inputType="numberDecimal"
                 android:longClickable="false"
-                android:paddingStart="@dimen/_6sdp"
-                android:textColor="@color/black"
-                android:textColorHint="@color/black"
-                app:drawableTint="@color/black"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/guideline4" />
+                android:maxLines="1"
+                android:paddingStart="@dimen/_6sdp" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-            <ImageView
-                android:id="@+id/submit_budget"
-                android:layout_width="@dimen/_40sdp"
-                android:layout_height="@dimen/_40sdp"
-                android:clickable="true"
-                android:padding="@dimen/_12sdp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/et_add_amount"
-                app:layout_constraintStart_toStartOf="@id/et_add_amount"
-                app:layout_constraintTop_toBottomOf="@+id/et_add_amount"
-                app:srcCompat="@drawable/ic_tick_mark"
-                app:tint="@color/lime_green" />
+        <ImageView
+            android:id="@+id/submit_budget"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:clickable="true"
+            android:padding="@dimen/_12sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/textIPlayout"
+            app:layout_constraintStart_toStartOf="@id/textIPlayout"
+            app:layout_constraintTop_toBottomOf="@+id/textIPlayout"
+            app:srcCompat="@drawable/ic_tick_mark"
+            app:tint="@color/lime_green" />
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.30" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.card.MaterialCardView>
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.30" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

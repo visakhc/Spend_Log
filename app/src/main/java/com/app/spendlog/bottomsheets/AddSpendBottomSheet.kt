@@ -1,5 +1,6 @@
 package com.app.spendlog.bottomsheets
 
+import android.Manifest
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
@@ -20,8 +21,10 @@ import android.widget.ImageView
 import android.widget.Toast
 import com.app.spendlog.R
 import com.app.spendlog.databinding.BottomsheetAddSpendBinding
-import com.app.spendlog.utils.LogUtil
-import com.app.spendlog.utils.SavedSession
+import com.app.spendlog.firebase.Childs.LEDGER
+import com.app.spendlog.firebase.Childs.SPEND
+import com.app.spendlog.ui.HomeActivity.Companion.totalSpend
+import com.app.spendlog.utils.*
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
@@ -32,6 +35,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.component1
 import com.google.firebase.storage.ktx.component2
 import com.google.firebase.storage.ktx.storage
+import com.permissionx.guolindev.PermissionX
 import java.io.ByteArrayOutputStream
 import java.text.DateFormatSymbols
 import java.text.SimpleDateFormat
@@ -103,7 +107,6 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        // Match the request 'pic id with requestCode
         if (requestCode == PicID) {
             // BitMap is data structure of image file
             // which stor the image in memory
@@ -122,7 +125,13 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
         }
         binding?.addImg?.setOnClickListener {
             val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            startActivityForResult(cameraIntent, PicID)
+            val p = listOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA
+            )
+            if (permissionX(p)) {
+                startActivityForResult(cameraIntent, PicID)
+            }
         }
         binding?.fabSave?.setOnClickListener {
             val mMonth = binding?.dpDate?.month.toString()
@@ -138,63 +147,45 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
             val matrix = ColorMatrix()
 
             if (spendType.isEmpty() || amount.isEmpty() || mDate.isEmpty() || mTime.isEmpty()) {
-                Toast.makeText(requireContext(), "Fill All Data", Toast.LENGTH_SHORT).show()
+                shortToast("Fill All Data")
             } else {
                 if (description.isEmpty()) {
                     description = "null"
                 }
-                rootKey.child("spend").child(mYear).child(mMonth).get().addOnSuccessListener {
-                    val spendId = it.childrenCount.toInt()
-//here todo
-                    rootKey.child("spend")
-                        .child(mYear)
-                        .child(mMonth)
-                        .child((spendId + 1).toString()).apply {
-                            child("spendType").setValue(spendType)
-                            child("amount").setValue(amount)
-                            child("description").setValue(description)
-                            child("snapimageid").setValue(timestamp)
-                            child("date").setValue(mDate)
-                            child("time").setValue(mTime)
-                            child("day").setValue(mDay)
-                            child("month").setValue(mMonth)
-                            child("year").setValue(mYear).addOnSuccessListener {
-                                rootKey.child(mYear.toString()).child(mMonth.toString())
-                                    .child("totalspend").get().addOnSuccessListener {
-                                    if (it.exists()) {
-                                        val lastTotal = it.value.toString()
-                                        rootKey.child(mYear.toString()).child(mMonth.toString())
-                                            .child("totalspend")
-                                            .setValue(lastTotal.toFloat() + amount.toFloat())
-                                    } else {
-                                        rootKey.child(mYear.toString()).child(mMonth.toString())
-                                            .child("totalspend").setValue(amount)
-                                    }
-                                    if (img?.drawable != null) {
-                                        uploadImg(img, timestamp)
-                                    } else {
-                                        Toast.makeText(
-                                            requireContext(),
-                                            "spend added",
-                                            Toast.LENGTH_SHORT
-                                        )
-                                            .show()
-                                        dialog?.dismiss()
-                                    }
-                                }
+
+                rootKey.child(SPEND)
+                    .child(mYear)
+                    .child(mMonth).push().apply {
+                        child("spendType").setValue(spendType)
+                        child("amount").setValue(amount)
+                        child("description").setValue(description)
+                        child("snapimageid").setValue(timestamp)
+                        child("date").setValue(mDate)
+                        child("time").setValue(mTime)
+                        child("day").setValue(mDay)
+                        child("month").setValue(mMonth)
+                        child("year").setValue(mYear).addOnSuccessListener {
+                            rootKey.child(LEDGER).child(mYear).child(mMonth).child("totalspend")
+                                .setValue(totalSpend + amount.toDouble())
+                            if (img?.drawable != null) {
+                                uploadImg(img, timestamp)
+                            } else {
+                                shortToast("Spend Added")
+                                dialog?.dismiss()
                             }
                         }
-                }
+                    }
             }
         }
     }
+
 
     private fun uploadImg(img: ImageView?, timestamp: String) {
         img?.isDrawingCacheEnabled = true
         img?.buildDrawingCache()
         val bitmap = (img?.drawable as BitmapDrawable).bitmap
         val baos = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 40, baos)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos)
         val data = baos.toByteArray()
         val uploadTask = imagesRef.child(timestamp).putBytes(data)
         uploadTask.addOnProgressListener { (bytesTransferred, totalByteCount) ->
@@ -208,14 +199,13 @@ class AddSpendBottomSheet : BottomSheetDialogFragment() {
             binding?.tvPgrss?.setTextColor(Color.RED)
         }
         uploadTask.addOnFailureListener {
-            LogUtil(it.message.toString())
+            logThis(it.message.toString())
             Snackbar.make(requireView(), "Failed to upload image", Snackbar.LENGTH_LONG)
                 .show()
         }.addOnSuccessListener { taskSnapshot ->
-            Toast.makeText(requireContext(), "spend added", Toast.LENGTH_SHORT)
-                .show()
+            shortToast("Spend Added")
             dialog?.dismiss()
-            LogUtil(taskSnapshot.metadata.toString())
+            logThis(taskSnapshot.metadata.toString())
         }
     }
 

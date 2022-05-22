@@ -10,13 +10,10 @@ import com.app.spendlog.ui.LoginActivity
 import com.app.spendlog.R
 import com.app.spendlog.databinding.BottomsheetSettingsBinding
 import com.app.spendlog.ui.HomeActivity
-import com.app.spendlog.utils.LogUtil
 import com.app.spendlog.utils.SavedSession
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 class SettingsBottomSheet : BottomSheetDialogFragment() {
     private var binding: BottomsheetSettingsBinding? = null
@@ -50,6 +47,10 @@ class SettingsBottomSheet : BottomSheetDialogFragment() {
         binding?.tvLogout?.setOnClickListener {
             SavedSession(requireContext()).clearSharedPrefs()
             clearGAuth()
+        }
+        binding?.tvAddBudget?.setOnClickListener {
+            dialog?.dismiss()
+            HomeActivity().showBudgetDialog(requireContext())
         }
     }
 

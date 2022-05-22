@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.app.spendlog.R
 import com.app.spendlog.model.SpendModel
@@ -27,22 +28,41 @@ class SpendAdapter(
     }
 
     class ViewHolder(itemView: View, var OnEachListener: OnEachListener) :
-        RecyclerView.ViewHolder(itemView), View.OnClickListener {
+        RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnLongClickListener {
         var spendType: ImageView = itemView.findViewById(R.id.iv_spend_type)
         var amount: TextView = itemView.findViewById(R.id.tv_amount_spend)
         var date: TextView = itemView.findViewById(R.id.tv_date)
         var time: TextView = itemView.findViewById(R.id.tv_time)
-         override fun onClick(v: View) {
-            OnEachListener.onEachClick(adapterPosition)
+        var cvDelete = itemView.findViewById<View>(R.id.cvDelete)
+        var tvDelete = itemView.findViewById<View>(R.id.tvDelete)
+
+        override fun onClick(v: View) {
+            if (cvDelete.isVisible) {
+                cvDelete.visibility = View.GONE
+            } else
+                    OnEachListener.onEachClick(adapterPosition)
+
+        }
+
+        override fun onLongClick(p0: View?): Boolean {
+            if (!cvDelete.isVisible) {
+                cvDelete.visibility = View.VISIBLE
+            }
+            return true
         }
 
         init {
             itemView.setOnClickListener(this)
+            itemView.setOnLongClickListener(this)
+            tvDelete.setOnClickListener {
+                OnEachListener.onLongPress(adapterPosition)
+            }
         }
     }
 
     interface OnEachListener {
         fun onEachClick(position: Int)
+        fun onLongPress(position: Int)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -60,7 +80,6 @@ class SpendAdapter(
                 "Movies" -> holder.spendType.setImageResource(R.drawable.ic_movies)
                 "Online Shopping" -> holder.spendType.setImageResource(R.drawable.ic_shopping)
             }
-
         }
     }
 }
